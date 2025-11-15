@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 217 33% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 217 33% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 217 33% 17%;
+    --primary: 195 48% 77%;
+    --primary-foreground: 217 33% 17%;
+    --secondary: 152 52% 80%;
+    --secondary-foreground: 217 33% 17%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 28 100% 85%;
+    --accent-foreground: 217 33% 17%;
+    --destructive: 0 72% 84%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 195 48% 77%;
+    --radius: 1rem;
+    --chart-1: 195 48% 77%;
+    --chart-2: 152 52% 80%;
+    --chart-3: 48 100% 96%;
+    --chart-4: 28 100% 85%;
+    --chart-5: 210 40% 96.1%;
+  }
+
+  .dark {
+    --background: 217 33% 17%;
+    --foreground: 0 0% 98%;
+    --card: 217 33% 17%;
+    --card-foreground: 0 0% 98%;
+    --popover: 217 33% 17%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 195 48% 77%;
+    --primary-foreground: 217 33% 17%;
+    --secondary: 152 52% 80%;
+    --secondary-foreground: 217 33% 17%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 28 100% 85%;
+    --accent-foreground: 217 33% 17%;
+    --destructive: 0 72% 84%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 195 48% 77%;
+    --chart-1: 195 48% 77%;
+    --chart-2: 152 52% 80%;
+    --chart-3: 48 100% 96%;
+    --chart-4: 28 100% 85%;
+    --chart-5: 210 40% 96.1%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Baby theme custom styles */
+.baby-gradient {
+  background: linear-gradient(135deg, #A8D5E2 0%, #B8E6D5 100%);
+}
+
+.confetti-animation {
+  animation: confetti 3s ease-in-out infinite;
+}
+
+@keyframes confetti {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
