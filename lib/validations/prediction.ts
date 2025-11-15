@@ -15,12 +15,8 @@ export const predictionSchema = z.object({
   }),
   weight: z.number().min(2.5, 'Weight must be at least 2.5 kg').max(4.5, 'Weight must be at most 4.5 kg'),
   height: z.number().min(40, 'Height must be at least 40 cm').max(60, 'Height must be at most 60 cm'),
-  eyeColor: z.enum(eyeColorIds, {
-    errorMap: () => ({ message: 'Please select a valid eye color' }),
-  }),
-  hairColor: z.enum(hairColorIds, {
-    errorMap: () => ({ message: 'Please select a valid hair color' }),
-  }),
+  eyeColor: z.enum(eyeColorIds),
+  hairColor: z.enum(hairColorIds),
 });
 
 export type PredictionInput = z.infer<typeof predictionSchema>;
