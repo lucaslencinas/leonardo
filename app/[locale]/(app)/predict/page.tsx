@@ -12,6 +12,8 @@ import { HairColorPicker } from '@/components/forms/HairColorPicker';
 import { EYE_COLORS, HAIR_COLORS, type EyeColorId, type HairColorId } from '@/lib/constants/colors';
 
 interface FormData {
+  userName: string;
+  userEmail: string;
   birthDate: Date;
   birthTime: { hours: number; minutes: number };
   weight: number;
@@ -28,6 +30,8 @@ export default function PredictPage() {
 
   // Form state
   const [formData, setFormData] = useState<FormData>({
+    userName: '',
+    userEmail: '',
     birthDate: dueDate,
     birthTime: { hours: 12, minutes: 0 },
     weight: 3.5, // kg
@@ -37,8 +41,14 @@ export default function PredictPage() {
   });
 
   const [currentStep, setCurrentStep] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
 
   const steps = [
+    { id: 'user', label: 'Your Info', icon: '👤' },
     { id: 'date', label: 'Birth Date', icon: '📅' },
     { id: 'time', label: 'Birth Time', icon: '⏰' },
     { id: 'weight', label: 'Weight', icon: '⚖️' },
@@ -61,10 +71,44 @@ export default function PredictPage() {
     }
   };
 
-  const handleSubmit = () => {
-    // TODO: Submit to database
-    console.log('Prediction submitted:', formData);
-    alert('🎉 Prediction submitted! (Database integration coming soon)');
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: '' });
+
+    try {
+      const response = await fetch('/api/predictions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to submit prediction');
+      }
+
+      setSubmitStatus({
+        type: 'success',
+        message: data.message || 'Prediction submitted successfully!',
+      });
+
+      // Scroll to top to show success message
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) {
+      console.error('Error submitting prediction:', error);
+      setSubmitStatus({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'An unexpected error occurred',
+      });
+
+      // Scroll to top to show error message
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const progress = ((currentStep + 1) / steps.length) * 100;
@@ -122,10 +166,84 @@ export default function PredictPage() {
         </div>
       </div>
 
+      {/* Success/Error Message */}
+      {submitStatus.type && (
+        <div
+          className={`mb-6 p-4 rounded-lg ${
+            submitStatus.type === 'success'
+              ? 'bg-green-50 border border-green-200 text-green-800'
+              : 'bg-red-50 border border-red-200 text-red-800'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">
+              {submitStatus.type === 'success' ? '✅' : '❌'}
+            </span>
+            <p className="font-medium">{submitStatus.message}</p>
+          </div>
+          {submitStatus.type === 'success' && (
+            <div className="mt-3">
+              <Link
+                href="/predictions"
+                className="text-sm text-green-700 underline hover:text-green-900"
+              >
+                View all predictions →
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Form content */}
       <div className="bg-white rounded-3xl shadow-lg p-8 mb-6">
         <div className="min-h-[500px]">
+          {/* Step 0: User Info */}
           {currentStep === 0 && (
+            <div className="space-y-6">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-heading font-bold text-neutral-dark mb-2">
+                  👤 Tell us about yourself
+                </h2>
+                <p className="text-neutral-medium">
+                  We'll use this to identify your prediction
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-neutral-dark mb-2">
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.userName}
+                  onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
+                  placeholder="Enter your full name"
+                  className="w-full px-4 py-3 border-2 border-neutral-light rounded-lg focus:border-baby-blue focus:outline-none transition-colors"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-neutral-dark mb-2">
+                  Your Email
+                </label>
+                <input
+                  type="email"
+                  value={formData.userEmail}
+                  onChange={(e) => setFormData({ ...formData, userEmail: e.target.value })}
+                  placeholder="your.email@example.com"
+                  className="w-full px-4 py-3 border-2 border-neutral-light rounded-lg focus:border-baby-blue focus:outline-none transition-colors"
+                  required
+                />
+                <p className="mt-2 text-xs text-neutral-medium">
+                  We'll never share your email. One prediction per email.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Step 1: Date */}
+          {currentStep === 1 && (
             <DateSlider
               value={formData.birthDate}
               onChange={(date) => setFormData({ ...formData, birthDate: date })}
@@ -134,7 +252,8 @@ export default function PredictPage() {
             />
           )}
 
-          {currentStep === 1 && (
+          {/* Step 2: Time */}
+          {currentStep === 2 && (
             <TimeSlider
               value={formData.birthTime}
               onChange={(time) => setFormData({ ...formData, birthTime: time })}
@@ -142,7 +261,8 @@ export default function PredictPage() {
             />
           )}
 
-          {currentStep === 2 && (
+          {/* Step 3: Weight */}
+          {currentStep === 3 && (
             <WeightSlider
               value={formData.weight}
               onChange={(weight) => setFormData({ ...formData, weight })}
@@ -150,7 +270,8 @@ export default function PredictPage() {
             />
           )}
 
-          {currentStep === 3 && (
+          {/* Step 4: Height */}
+          {currentStep === 4 && (
             <HeightSlider
               value={formData.height}
               onChange={(height) => setFormData({ ...formData, height })}
@@ -158,7 +279,8 @@ export default function PredictPage() {
             />
           )}
 
-          {currentStep === 4 && (
+          {/* Step 5: Eye Color */}
+          {currentStep === 5 && (
             <EyeColorPicker
               value={formData.eyeColor}
               onChange={(eyeColor: EyeColorId) => setFormData({ ...formData, eyeColor })}
@@ -166,7 +288,8 @@ export default function PredictPage() {
             />
           )}
 
-          {currentStep === 5 && (
+          {/* Step 6: Hair Color */}
+          {currentStep === 6 && (
             <HairColorPicker
               value={formData.hairColor}
               onChange={(hairColor: HairColorId) => setFormData({ ...formData, hairColor })}
@@ -200,16 +323,26 @@ export default function PredictPage() {
         {currentStep < steps.length - 1 ? (
           <button
             onClick={handleNext}
-            className="px-6 py-3 bg-baby-blue text-white font-semibold rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200"
+            disabled={currentStep === 0 && (!formData.userName || !formData.userEmail)}
+            className={`px-6 py-3 font-semibold rounded-2xl shadow-md transition-all duration-200 ${
+              currentStep === 0 && (!formData.userName || !formData.userEmail)
+                ? 'bg-neutral-light text-neutral-medium cursor-not-allowed'
+                : 'bg-baby-blue text-white hover:shadow-lg hover:scale-105'
+            }`}
           >
             Next →
           </button>
         ) : (
           <button
             onClick={handleSubmit}
-            className="px-8 py-3 bg-gradient-to-r from-baby-blue to-baby-mint text-white font-bold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
+            disabled={isSubmitting || submitStatus.type === 'success'}
+            className={`px-8 py-3 font-bold rounded-2xl shadow-lg transition-all duration-200 ${
+              isSubmitting || submitStatus.type === 'success'
+                ? 'bg-neutral-light text-neutral-medium cursor-not-allowed'
+                : 'bg-gradient-to-r from-baby-blue to-baby-mint text-white hover:shadow-xl hover:scale-105'
+            }`}
           >
-            {t('submitPrediction')} 🎉
+            {isSubmitting ? 'Submitting...' : submitStatus.type === 'success' ? 'Submitted ✓' : `${t('submitPrediction')} 🎉`}
           </button>
         )}
       </div>
@@ -221,6 +354,14 @@ export default function PredictPage() {
             📋 Your Prediction Summary
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+            <div className="col-span-2">
+              <span className="text-neutral-medium">Name:</span>
+              <div className="font-semibold">{formData.userName || 'Not provided'}</div>
+            </div>
+            <div className="col-span-2">
+              <span className="text-neutral-medium">Email:</span>
+              <div className="font-semibold">{formData.userEmail || 'Not provided'}</div>
+            </div>
             <div>
               <span className="text-neutral-medium">Date:</span>
               <div className="font-semibold">{formData.birthDate.toLocaleDateString()}</div>
