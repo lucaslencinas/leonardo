@@ -4,8 +4,8 @@ import { useState } from "react";
 import { HAIR_COLORS, type HairColorId } from "@/lib/constants/colors";
 
 interface HairColorPickerProps {
-  value: string;
-  onChange: (colorId: string) => void;
+  value: HairColorId;
+  onChange: (colorId: HairColorId) => void;
   label: string;
 }
 

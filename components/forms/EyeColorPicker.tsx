@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { EYE_COLORS, type EyeColorId } from '@/lib/constants/colors';
 
 interface EyeColorPickerProps {
-  value: string;
-  onChange: (colorId: string) => void;
+  value: EyeColorId;
+  onChange: (colorId: EyeColorId) => void;
   label: string;
 }
 

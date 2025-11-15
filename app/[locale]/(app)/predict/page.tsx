@@ -9,7 +9,16 @@ import { WeightSlider } from '@/components/forms/WeightSlider';
 import { HeightSlider } from '@/components/forms/HeightSlider';
 import { EyeColorPicker } from '@/components/forms/EyeColorPicker';
 import { HairColorPicker } from '@/components/forms/HairColorPicker';
-import { EYE_COLORS, HAIR_COLORS } from '@/lib/constants/colors';
+import { EYE_COLORS, HAIR_COLORS, type EyeColorId, type HairColorId } from '@/lib/constants/colors';
+
+interface FormData {
+  birthDate: Date;
+  birthTime: { hours: number; minutes: number };
+  weight: number;
+  height: number;
+  eyeColor: EyeColorId;
+  hairColor: HairColorId;
+}
 
 export default function PredictPage() {
   const t = useTranslations('predict');
@@ -18,13 +27,13 @@ export default function PredictPage() {
   const dueDate = new Date('2026-02-05T12:00:00');
 
   // Form state
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     birthDate: dueDate,
     birthTime: { hours: 12, minutes: 0 },
     weight: 3.5, // kg
     height: 50, // cm
     eyeColor: EYE_COLORS[3].id, // light-brown (common for babies)
-    hairColor: HAIR_COLORS[4].id, // light-brown
+    hairColor: HAIR_COLORS[4].id, // brown
   });
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -152,7 +161,7 @@ export default function PredictPage() {
           {currentStep === 4 && (
             <EyeColorPicker
               value={formData.eyeColor}
-              onChange={(eyeColor) => setFormData({ ...formData, eyeColor })}
+              onChange={(eyeColor: EyeColorId) => setFormData({ ...formData, eyeColor })}
               label={t('eyeColor')}
             />
           )}
@@ -160,7 +169,7 @@ export default function PredictPage() {
           {currentStep === 5 && (
             <HairColorPicker
               value={formData.hairColor}
-              onChange={(hairColor) => setFormData({ ...formData, hairColor })}
+              onChange={(hairColor: HairColorId) => setFormData({ ...formData, hairColor })}
               label={t('hairColor')}
             />
           )}
