@@ -34,7 +34,7 @@ export function HairColorResultsView({ predictions }: HairColorResultsViewProps)
       </div>
 
       <div className="bg-baby-peach/10 rounded-2xl p-6">
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
           {HAIR_COLORS.map((color) => {
             const count = colorCounts[color.id] || 0;
             const predictors = colorPredictors[color.id] || [];

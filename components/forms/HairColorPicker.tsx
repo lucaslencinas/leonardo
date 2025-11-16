@@ -27,10 +27,11 @@ export function HairColorPicker({
     onChange(HAIR_COLORS[index].id);
   };
 
-  const handleMouseDown = () => setShowPreview(true);
-  const handleMouseUp = () => setShowPreview(false);
-  const handleTouchStart = () => setShowPreview(true);
-  const handleTouchEnd = () => setShowPreview(false);
+  // Disabled preview popup
+  const handleMouseDown = () => {}; // setShowPreview(true);
+  const handleMouseUp = () => {}; // setShowPreview(false);
+  const handleTouchStart = () => {}; // setShowPreview(true);
+  const handleTouchEnd = () => {}; // setShowPreview(false);
 
   // Create gradient from all hair colors
   const gradientStops = HAIR_COLORS.map((color, index) => {
@@ -118,14 +119,11 @@ export function HairColorPicker({
             }}
           >
             <div className="w-full h-full flex items-center justify-center">
-              <div className={`text-center space-y-2 drop-shadow-lg ${
+              <div className={`text-center drop-shadow-lg ${
                 previewIndex <= 3 ? 'text-neutral-dark' : 'text-white'
               }`}>
                 <div className="text-4xl font-heading font-bold">
                   {HAIR_COLORS[previewIndex].name}
-                </div>
-                <div className="text-sm opacity-90">
-                  {HAIR_COLORS[previewIndex].hex}
                 </div>
               </div>
             </div>

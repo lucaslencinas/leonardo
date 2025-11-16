@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { DateSlider } from '@/components/forms/DateSlider';
@@ -46,6 +46,67 @@ export default function PredictPage() {
     type: 'success' | 'error' | null;
     message: string;
   }>({ type: null, message: '' });
+  const [submissionsLocked, setSubmissionsLocked] = useState(false);
+  const [isCheckingLock, setIsCheckingLock] = useState(true);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isLoadingPrediction, setIsLoadingPrediction] = useState(true);
+
+  // Check if submissions are locked AND fetch existing prediction
+  useEffect(() => {
+    const checkLockStatus = async () => {
+      try {
+        const response = await fetch('/api/admin/settings');
+        const data = await response.json();
+        if (response.ok && data.settings) {
+          setSubmissionsLocked(data.settings.submissionsLocked);
+        }
+      } catch (err) {
+        console.error('Failed to check lock status:', err);
+      } finally {
+        setIsCheckingLock(false);
+      }
+    };
+
+    const loadExistingPrediction = async () => {
+      try {
+        // Check localStorage for user's email
+        const savedEmail = localStorage.getItem('predictionSubmitted');
+
+        if (savedEmail) {
+          const response = await fetch(`/api/predictions/by-email?email=${encodeURIComponent(savedEmail)}`);
+          const data = await response.json();
+
+          if (response.ok && data.prediction) {
+            const pred = data.prediction;
+
+            // Parse birth time from "HH:MM" format
+            const [hours, minutes] = pred.birthTime.split(':').map(Number);
+
+            // Pre-fill form with existing prediction
+            setFormData({
+              userName: pred.userName || '',
+              userEmail: pred.userEmail || '',
+              birthDate: new Date(pred.birthDate),
+              birthTime: { hours, minutes },
+              weight: pred.weight,
+              height: pred.height,
+              eyeColor: pred.eyeColor as EyeColorId,
+              hairColor: pred.hairColor as HairColorId,
+            });
+
+            setIsEditMode(true);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load existing prediction:', err);
+      } finally {
+        setIsLoadingPrediction(false);
+      }
+    };
+
+    checkLockStatus();
+    loadExistingPrediction();
+  }, []);
 
   const steps = [
     { id: 'user', label: 'Your Info', icon: '👤' },
@@ -91,6 +152,9 @@ export default function PredictPage() {
         throw new Error(data.error || 'Failed to submit prediction');
       }
 
+      // Save email to localStorage to track that user has submitted
+      localStorage.setItem('predictionSubmitted', formData.userEmail);
+
       setSubmitStatus({
         type: 'success',
         message: data.message || 'Prediction submitted successfully!',
@@ -126,49 +190,99 @@ export default function PredictPage() {
         </p>
       </div>
 
-      {/* Progress bar */}
-      <div className="mb-8">
-        <div className="flex justify-between mb-2">
-          {steps.map((step, index) => (
-            <div
-              key={step.id}
-              className={`flex flex-col items-center gap-1 cursor-pointer transition-all duration-200 ${
-                index === currentStep
-                  ? 'scale-110'
-                  : index < currentStep
-                  ? 'opacity-60'
-                  : 'opacity-30'
-              }`}
-              onClick={() => setCurrentStep(index)}
+      {/* Submissions Locked Warning */}
+      {submissionsLocked && (
+        <div className="bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-300 rounded-3xl shadow-lg p-8 mb-8 text-center">
+          <div className="text-6xl mb-4">🔒</div>
+          <h2 className="text-2xl font-heading font-bold text-neutral-dark mb-2">
+            Submissions Are Closed
+          </h2>
+          <p className="text-lg text-neutral-medium mb-6">
+            We're no longer accepting new predictions. The baby has arrived or submissions have been locked by the administrator.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href="/"
+              className="px-6 py-3 bg-white border-2 border-neutral-light text-neutral-dark font-semibold rounded-2xl hover:bg-neutral-light transition-all duration-200"
             >
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${
-                  index <= currentStep
-                    ? 'bg-baby-blue text-white shadow-md'
-                    : 'bg-neutral-light text-neutral-medium'
-                }`}
-              >
-                {index < currentStep ? '✓' : step.icon}
-              </div>
-              <span className="text-xs font-medium text-neutral-dark hidden md:block">
-                {step.label}
-              </span>
-            </div>
-          ))}
+              ← Back to Home
+            </Link>
+            <Link
+              href="/predictions"
+              className="px-6 py-3 bg-baby-blue text-white font-semibold rounded-2xl hover:shadow-lg hover:scale-105 transition-all duration-200"
+            >
+              View Predictions →
+            </Link>
+          </div>
         </div>
-        <div className="h-2 bg-neutral-light rounded-full overflow-hidden">
-          <div
-            className="h-full bg-baby-blue transition-all duration-500 ease-out"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <div className="text-center mt-2 text-sm text-neutral-medium">
-          Step {currentStep + 1} of {steps.length}
-        </div>
-      </div>
+      )}
 
-      {/* Form content */}
-      <div className="bg-white rounded-3xl shadow-lg p-8 mb-6">
+      {/* Show form only if submissions are open */}
+      {!isCheckingLock && !submissionsLocked && (
+        <>
+          {/* Edit Mode Banner */}
+          {isEditMode && !isLoadingPrediction && (
+            <div className="bg-gradient-to-r from-baby-mint/20 to-baby-blue/20 border-2 border-baby-blue rounded-3xl shadow-md p-6 mb-8 text-center">
+              <div className="text-4xl mb-2">✏️</div>
+              <h3 className="text-xl font-heading font-bold text-neutral-dark mb-1">
+                You're Editing Your Prediction
+              </h3>
+              <p className="text-neutral-medium">
+                Your form has been pre-filled with your previous prediction. Make any changes you'd like and click "Update My Prediction" when you're done.
+              </p>
+            </div>
+          )}
+
+          {/* Progress bar */}
+          <div className="mb-8">
+            <div className="flex justify-between mb-2">
+              {steps.map((step, index) => {
+                // Only allow clicking on completed steps (with validation)
+                const canNavigate = index < currentStep && formData.userName && formData.userEmail;
+
+                return (
+                <div
+                  key={step.id}
+                  className={`flex flex-col items-center gap-1 transition-all duration-200 ${
+                    canNavigate ? 'cursor-pointer' : 'cursor-not-allowed'
+                  } ${
+                    index === currentStep
+                      ? 'scale-110'
+                      : index < currentStep
+                      ? 'opacity-60'
+                      : 'opacity-30'
+                  }`}
+                  onClick={() => canNavigate && setCurrentStep(index)}
+                >
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${
+                      index <= currentStep
+                        ? 'bg-baby-blue text-white shadow-md'
+                        : 'bg-neutral-light text-neutral-medium'
+                    }`}
+                  >
+                    {index < currentStep ? '✓' : step.icon}
+                  </div>
+                  <span className="text-xs font-medium text-neutral-dark hidden md:block">
+                    {step.label}
+                  </span>
+                </div>
+                );
+              })}
+            </div>
+            <div className="h-2 bg-neutral-light rounded-full overflow-hidden">
+              <div
+                className="h-full bg-baby-blue transition-all duration-500 ease-out"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <div className="text-center mt-2 text-sm text-neutral-medium">
+              Step {currentStep + 1} of {steps.length}
+            </div>
+          </div>
+
+          {/* Form content */}
+          <div className="bg-white rounded-3xl shadow-lg p-8 mb-6">
         <div className="min-h-[500px]">
           {/* Step 0: User Info */}
           {currentStep === 0 && (
@@ -190,7 +304,7 @@ export default function PredictPage() {
                   type="text"
                   value={formData.userName}
                   onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
-                  placeholder="Enter your full name"
+                  placeholder="e.g., John Smith"
                   className="w-full px-4 py-3 border-2 border-neutral-light rounded-lg focus:border-baby-blue focus:outline-none transition-colors"
                   required
                 />
@@ -276,12 +390,15 @@ export default function PredictPage() {
               {/* Success or ready message */}
               {submitStatus.type === 'success' ? (
                 <div className="text-center py-12">
-                  <div className="text-8xl mb-6 animate-bounce">🎉</div>
+                  <div className="text-8xl mb-6 animate-bounce">{isEditMode ? '✅' : '🎉'}</div>
                   <h2 className="text-3xl font-heading font-bold text-neutral-dark mb-4">
-                    Prediction Submitted!
+                    {isEditMode ? 'Prediction Updated!' : 'Prediction Submitted!'}
                   </h2>
                   <p className="text-lg text-neutral-medium mb-8">
-                    Thank you for participating! Your prediction has been saved.
+                    {isEditMode
+                      ? 'Your prediction has been successfully updated!'
+                      : 'Thank you for participating! Your prediction has been saved.'
+                    }
                   </p>
                   <Link
                     href="/predictions"
@@ -304,48 +421,66 @@ export default function PredictPage() {
 
               {/* Summary Card */}
               {submitStatus.type !== 'success' && (
-                <div className="bg-baby-cream/30 rounded-3xl p-8 border-2 border-baby-cream">
-                  <h3 className="text-xl font-heading font-bold text-neutral-dark mb-6 text-center">
+                <div className="bg-baby-cream/30 rounded-3xl p-6 border-2 border-baby-cream space-y-4">
+                  <h3 className="text-lg font-heading font-bold text-neutral-dark text-center">
                     Your Prediction Summary
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white rounded-2xl p-4">
-                      <span className="text-sm text-neutral-medium">Name</span>
-                      <div className="text-lg font-bold text-neutral-dark">{formData.userName || 'Not provided'}</div>
-                    </div>
-                    <div className="bg-white rounded-2xl p-4">
-                      <span className="text-sm text-neutral-medium">Email</span>
-                      <div className="text-lg font-bold text-neutral-dark">{formData.userEmail || 'Not provided'}</div>
-                    </div>
-                    <div className="bg-white rounded-2xl p-4">
-                      <span className="text-sm text-neutral-medium">📅 Birth Date</span>
-                      <div className="text-lg font-bold text-neutral-dark">{formData.birthDate.toLocaleDateString()}</div>
-                    </div>
-                    <div className="bg-white rounded-2xl p-4">
-                      <span className="text-sm text-neutral-medium">⏰ Birth Time</span>
-                      <div className="text-lg font-bold text-neutral-dark">
-                        {String(formData.birthTime.hours).padStart(2, '0')}:
-                        {String(formData.birthTime.minutes).padStart(2, '0')}
+
+                  {/* Personal Info Section */}
+                  <div className="bg-white rounded-2xl p-4">
+                    <h4 className="text-xs font-semibold text-neutral-medium uppercase mb-2">Personal Info</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <span className="text-xs text-neutral-medium">Name</span>
+                        <div className="text-base font-bold text-neutral-dark">{formData.userName}</div>
+                      </div>
+                      <div>
+                        <span className="text-xs text-neutral-medium">Email</span>
+                        <div className="text-base font-bold text-neutral-dark truncate">{formData.userEmail}</div>
                       </div>
                     </div>
-                    <div className="bg-white rounded-2xl p-4">
-                      <span className="text-sm text-neutral-medium">⚖️ Weight</span>
-                      <div className="text-lg font-bold text-neutral-dark">{formData.weight} kg</div>
-                    </div>
-                    <div className="bg-white rounded-2xl p-4">
-                      <span className="text-sm text-neutral-medium">📏 Height</span>
-                      <div className="text-lg font-bold text-neutral-dark">{formData.height} cm</div>
-                    </div>
-                    <div className="bg-white rounded-2xl p-4">
-                      <span className="text-sm text-neutral-medium">👁️ Eye Color</span>
-                      <div className="text-lg font-bold text-neutral-dark capitalize">
-                        {EYE_COLORS.find((c) => c.id === formData.eyeColor)?.name}
+                  </div>
+
+                  {/* Birth Details Section */}
+                  <div className="bg-white rounded-2xl p-4">
+                    <h4 className="text-xs font-semibold text-neutral-medium uppercase mb-2">Birth Details</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <span className="text-xs text-neutral-medium">📅 Date</span>
+                        <div className="text-base font-bold text-neutral-dark">{formData.birthDate.toLocaleDateString()}</div>
+                      </div>
+                      <div>
+                        <span className="text-xs text-neutral-medium">⏰ Time</span>
+                        <div className="text-base font-bold text-neutral-dark">
+                          {String(formData.birthTime.hours).padStart(2, '0')}:{String(formData.birthTime.minutes).padStart(2, '0')}
+                        </div>
                       </div>
                     </div>
-                    <div className="bg-white rounded-2xl p-4">
-                      <span className="text-sm text-neutral-medium">💇 Hair Color</span>
-                      <div className="text-lg font-bold text-neutral-dark capitalize">
-                        {HAIR_COLORS.find((c) => c.id === formData.hairColor)?.name}
+                  </div>
+
+                  {/* Physical Details Section */}
+                  <div className="bg-white rounded-2xl p-4">
+                    <h4 className="text-xs font-semibold text-neutral-medium uppercase mb-2">Physical Details</h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div>
+                        <span className="text-xs text-neutral-medium">⚖️ Weight</span>
+                        <div className="text-base font-bold text-neutral-dark">{formData.weight} kg</div>
+                      </div>
+                      <div>
+                        <span className="text-xs text-neutral-medium">📏 Height</span>
+                        <div className="text-base font-bold text-neutral-dark">{formData.height} cm</div>
+                      </div>
+                      <div>
+                        <span className="text-xs text-neutral-medium">👁️ Eyes</span>
+                        <div className="text-base font-bold text-neutral-dark capitalize">
+                          {EYE_COLORS.find((c) => c.id === formData.eyeColor)?.name}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-xs text-neutral-medium">💇 Hair</span>
+                        <div className="text-base font-bold text-neutral-dark capitalize">
+                          {HAIR_COLORS.find((c) => c.id === formData.hairColor)?.name}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -366,18 +501,17 @@ export default function PredictPage() {
       {/* Navigation buttons */}
       {submitStatus.type !== 'success' && (
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-between">
-          <button
-            onClick={handlePrevious}
-            disabled={currentStep === 0}
-            className={`w-full sm:w-auto px-6 py-3 rounded-2xl font-semibold transition-all duration-200 ${
-              currentStep === 0
-                ? 'bg-neutral-light text-neutral-medium cursor-not-allowed'
-                : 'bg-white border-2 border-baby-blue text-baby-blue hover:bg-baby-blue hover:text-white shadow-md hover:shadow-lg'
-            }`}
-          >
-            ← Previous
-          </button>
+          {/* Previous button - hidden on first step */}
+          {currentStep > 0 && (
+            <button
+              onClick={handlePrevious}
+              className="w-full sm:w-auto px-6 py-3 rounded-2xl font-semibold transition-all duration-200 bg-white border-2 border-baby-blue text-baby-blue hover:bg-baby-blue hover:text-white shadow-md hover:shadow-lg"
+            >
+              ← Previous
+            </button>
+          )}
 
+          {/* Cancel button */}
           <Link
             href="/"
             className="w-full sm:w-auto px-6 py-3 bg-neutral-light text-neutral-dark font-semibold rounded-2xl hover:bg-neutral-medium/20 transition-all duration-200 text-center"
@@ -385,6 +519,7 @@ export default function PredictPage() {
             Cancel
           </Link>
 
+          {/* Next button - shown on all steps except last */}
           {currentStep < steps.length - 1 ? (
             <button
               onClick={handleNext}
@@ -398,18 +533,32 @@ export default function PredictPage() {
               Next →
             </button>
           ) : (
+            /* Submit button - shown only on last step */
             <button
               onClick={handleSubmit}
-              disabled={isSubmitting || submitStatus.type === 'success'}
+              disabled={isSubmitting}
               className={`w-full sm:w-auto px-8 py-3 font-bold rounded-2xl shadow-lg transition-all duration-200 ${
-                isSubmitting || submitStatus.type === 'success'
+                isSubmitting
                   ? 'bg-neutral-light text-neutral-medium cursor-not-allowed'
                   : 'bg-gradient-to-r from-baby-blue to-baby-mint text-white hover:shadow-xl hover:scale-105'
               }`}
             >
-              {isSubmitting ? 'Submitting...' : submitStatus.type === 'success' ? 'Submitted ✓' : `${t('submitPrediction')} 🎉`}
+              {isSubmitting
+                ? (isEditMode ? 'Updating...' : 'Submitting...')
+                : (isEditMode ? 'Update My Prediction ✏️' : `${t('submitPrediction')} 🎉`)
+              }
             </button>
           )}
+        </div>
+      )}
+        </>
+      )}
+
+      {/* Loading State */}
+      {isCheckingLock && (
+        <div className="bg-white rounded-3xl shadow-lg p-12 text-center">
+          <div className="text-6xl mb-4">⏳</div>
+          <p className="text-lg text-neutral-medium">Checking submission status...</p>
         </div>
       )}
     </div>

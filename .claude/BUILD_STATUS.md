@@ -128,26 +128,23 @@ Nothing currently in progress - ready for Phase 3!
 
 ---
 
-## 📋 Next Phase: Polish & Optional Features
+## 📋 Next Phase: Polish & Final Touches
 
-### **Phase 3: Polish & Enhancements**
+### **Phase 3: Essential Features**
+- [x] Deploy Phase 2 to Vercel
+- [ ] Lock submissions on January 5, 2026 (in progress)
 - [ ] Test admin panel in production
-- [ ] Deploy Phase 2 to Vercel
 - [ ] Remove Vercel deployment protection (optional)
-- [ ] Custom domain configuration (optional)
-- [ ] Share prediction on social media
-- [ ] Lock submissions on January 5, 2026 (auto or manual)
-- [ ] Email notifications (optional)
-- [ ] Analytics tracking (optional)
+
+### **Phase 4: Optional Polish**
+- [ ] Custom domain configuration
+- [ ] Email notifications
+- [ ] Analytics tracking
 - [ ] Performance optimizations
 - [ ] SEO improvements
 
-### **Phase 4: Bonding Features** (See [BONDING_FEATURES.md](.claude/BONDING_FEATURES.md))
-- [ ] Wishes & Advice Wall
-- [ ] Extended predictions (fun categories)
-- [ ] Time capsule messages
-- [ ] Team competitions
-- [ ] Achievement badges
+### **Phase 5: Bonding Features** (See [BONDING_FEATURES.md](.claude/BONDING_FEATURES.md))
+*Optional engagement features - refer to BONDING_FEATURES.md for details*
 
 ---
 

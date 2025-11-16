@@ -22,10 +22,11 @@ export function EyeColorPicker({ value, onChange, label }: EyeColorPickerProps) 
     onChange(EYE_COLORS[index].id);
   };
 
-  const handleMouseDown = () => setShowPreview(true);
-  const handleMouseUp = () => setShowPreview(false);
-  const handleTouchStart = () => setShowPreview(true);
-  const handleTouchEnd = () => setShowPreview(false);
+  // Disabled preview popup
+  const handleMouseDown = () => {}; // setShowPreview(true);
+  const handleMouseUp = () => {}; // setShowPreview(false);
+  const handleTouchStart = () => {}; // setShowPreview(true);
+  const handleTouchEnd = () => {}; // setShowPreview(false);
 
   // Create gradient from all eye colors
   const gradientStops = EYE_COLORS.map((color, index) => {
@@ -116,12 +117,9 @@ export function EyeColorPicker({ value, onChange, label }: EyeColorPickerProps) 
             }}
           >
             <div className="w-full h-full flex items-center justify-center">
-              <div className="text-white text-center space-y-2 drop-shadow-lg">
+              <div className="text-white text-center drop-shadow-lg">
                 <div className="text-4xl font-heading font-bold">
                   {EYE_COLORS[previewIndex].name}
-                </div>
-                <div className="text-sm opacity-90">
-                  {EYE_COLORS[previewIndex].hex}
                 </div>
               </div>
             </div>

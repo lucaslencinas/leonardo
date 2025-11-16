@@ -7,6 +7,15 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
+    // Check if submissions are locked
+    const settings = await prisma.settings.findFirst();
+    if (settings?.submissionsLocked) {
+      return NextResponse.json(
+        { error: 'Submissions are currently closed. Please contact the administrator.' },
+        { status: 403 }
+      );
+    }
+
     // Validate the request body
     const validatedData = predictionSchema.parse(body);
 
@@ -14,20 +23,69 @@ export async function POST(request: NextRequest) {
     const existingPrediction = await prisma.prediction.findFirst({
       where: {
         user: {
-          email: validatedData.userEmail,
+          email: {
+            equals: validatedData.userEmail,
+            mode: 'insensitive',
+          },
         },
+      },
+      include: {
+        user: true,
       },
     });
 
-    if (existingPrediction) {
-      return NextResponse.json(
-        { error: 'You have already submitted a prediction. Only one prediction per person is allowed.' },
-        { status: 400 }
-      );
-    }
-
     // Format birth time as "HH:MM"
     const birthTime = `${validatedData.birthTime.hours.toString().padStart(2, '0')}:${validatedData.birthTime.minutes.toString().padStart(2, '0')}`;
+
+    // If prediction exists, UPDATE it instead of creating a new one
+    if (existingPrediction) {
+      const updatedPrediction = await prisma.$transaction(async (tx) => {
+        // Update user name if it changed
+        const user = await tx.user.update({
+          where: { id: existingPrediction.userId },
+          data: {
+            name: validatedData.userName,
+          },
+        });
+
+        // Update the prediction
+        const updated = await tx.prediction.update({
+          where: { id: existingPrediction.id },
+          data: {
+            birthDate: validatedData.birthDate,
+            birthTime,
+            weight: validatedData.weight,
+            height: validatedData.height,
+            eyeColor: validatedData.eyeColor,
+            hairColor: validatedData.hairColor,
+          },
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        });
+
+        return updated;
+      });
+
+      return NextResponse.json(
+        {
+          success: true,
+          updated: true,
+          message: 'Prediction updated successfully!',
+          prediction: {
+            id: updatedPrediction.id,
+            userName: updatedPrediction.user.name,
+            submittedAt: updatedPrediction.submittedAt,
+          },
+        },
+        { status: 200 }
+      );
+    }
 
     // Create user and prediction in a transaction
     const prediction = await prisma.$transaction(async (tx) => {

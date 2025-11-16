@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { DatePicker } from '@/components/forms/DatePicker';
-import { TimePicker } from '@/components/forms/TimePicker';
+import { useRouter } from '@/i18n/routing';
+import { DateSlider } from '@/components/forms/DateSlider';
+import { TimeSlider } from '@/components/forms/TimeSlider';
 import { WeightSlider } from '@/components/forms/WeightSlider';
 import { HeightSlider } from '@/components/forms/HeightSlider';
 import { EyeColorPicker } from '@/components/forms/EyeColorPicker';
 import { HairColorPicker } from '@/components/forms/HairColorPicker';
-import { type EyeColorId, type HairColorId } from '@/lib/colors';
+import { type EyeColorId, type HairColorId } from '@/lib/constants/colors';
 
 interface ActualResultsData {
   birthDate: Date;
@@ -27,8 +27,11 @@ export default function AdminResultsPage() {
   const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [existingResults, setExistingResults] = useState<ActualResultsData | null>(null);
 
+  // Due date from settings (January 5, 2026)
+  const dueDate = new Date(2026, 0, 5); // Jan 5, 2026 (month is 0-indexed)
+
   const [formData, setFormData] = useState<ActualResultsData>({
-    birthDate: new Date(2026, 1, 5), // Feb 5, 2026
+    birthDate: new Date(2026, 0, 5), // Jan 5, 2026
     birthTime: { hours: 12, minutes: 0 },
     weight: 3.5,
     height: 50,
@@ -117,6 +120,11 @@ export default function AdminResultsPage() {
           message: existingResults ? 'Results updated successfully!' : 'Results saved successfully!',
         });
         setExistingResults(formData);
+
+        // Redirect to winners page after 2 seconds
+        setTimeout(() => {
+          router.push('/admin/winners');
+        }, 2000);
       } else {
         setSaveStatus({
           type: 'error',
@@ -172,9 +180,10 @@ export default function AdminResultsPage() {
             <h3 className="text-lg font-heading font-bold text-neutral-dark mb-4">
               📅 Birth Date
             </h3>
-            <DatePicker
+            <DateSlider
               value={formData.birthDate}
               onChange={(date) => setFormData({ ...formData, birthDate: date })}
+              dueDate={dueDate}
               label="Actual birth date"
             />
           </div>
@@ -184,7 +193,7 @@ export default function AdminResultsPage() {
             <h3 className="text-lg font-heading font-bold text-neutral-dark mb-4">
               ⏰ Birth Time
             </h3>
-            <TimePicker
+            <TimeSlider
               value={formData.birthTime}
               onChange={(time) => setFormData({ ...formData, birthTime: time })}
               label="Actual birth time"
