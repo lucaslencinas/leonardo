@@ -145,6 +145,10 @@ export async function GET() {
         eyeColor: p.eyeColor,
         hairColor: p.hairColor,
         submittedAt: p.submittedAt,
+        user: {
+          name: p.user.name,
+          email: p.user.email,
+        },
       })),
     });
   } catch (error) {

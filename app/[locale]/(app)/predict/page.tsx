@@ -55,6 +55,7 @@ export default function PredictPage() {
     { id: 'height', label: 'Height', icon: '📏' },
     { id: 'eyes', label: 'Eye Color', icon: '👁️' },
     { id: 'hair', label: 'Hair Color', icon: '💇' },
+    { id: 'review', label: 'Review', icon: '✓' },
   ];
 
   const handleNext = () => {
@@ -166,34 +167,6 @@ export default function PredictPage() {
         </div>
       </div>
 
-      {/* Success/Error Message */}
-      {submitStatus.type && (
-        <div
-          className={`mb-6 p-4 rounded-lg ${
-            submitStatus.type === 'success'
-              ? 'bg-green-50 border border-green-200 text-green-800'
-              : 'bg-red-50 border border-red-200 text-red-800'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">
-              {submitStatus.type === 'success' ? '✅' : '❌'}
-            </span>
-            <p className="font-medium">{submitStatus.message}</p>
-          </div>
-          {submitStatus.type === 'success' && (
-            <div className="mt-3">
-              <Link
-                href="/predictions"
-                className="text-sm text-green-700 underline hover:text-green-900"
-              >
-                View all predictions →
-              </Link>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Form content */}
       <div className="bg-white rounded-3xl shadow-lg p-8 mb-6">
         <div className="min-h-[500px]">
@@ -296,104 +269,147 @@ export default function PredictPage() {
               label={t('hairColor')}
             />
           )}
+
+          {/* Step 7: Review & Submit */}
+          {currentStep === 7 && (
+            <div className="space-y-6">
+              {/* Success or ready message */}
+              {submitStatus.type === 'success' ? (
+                <div className="text-center py-12">
+                  <div className="text-8xl mb-6 animate-bounce">🎉</div>
+                  <h2 className="text-3xl font-heading font-bold text-neutral-dark mb-4">
+                    Prediction Submitted!
+                  </h2>
+                  <p className="text-lg text-neutral-medium mb-8">
+                    Thank you for participating! Your prediction has been saved.
+                  </p>
+                  <Link
+                    href="/predictions"
+                    className="inline-block px-8 py-4 bg-baby-blue text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
+                  >
+                    View all predictions →
+                  </Link>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="text-6xl mb-4">📋</div>
+                  <h2 className="text-2xl font-heading font-bold text-neutral-dark mb-2">
+                    Review Your Prediction
+                  </h2>
+                  <p className="text-neutral-medium mb-8">
+                    Please check your prediction before submitting
+                  </p>
+                </div>
+              )}
+
+              {/* Summary Card */}
+              {submitStatus.type !== 'success' && (
+                <div className="bg-baby-cream/30 rounded-3xl p-8 border-2 border-baby-cream">
+                  <h3 className="text-xl font-heading font-bold text-neutral-dark mb-6 text-center">
+                    Your Prediction Summary
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-white rounded-2xl p-4">
+                      <span className="text-sm text-neutral-medium">Name</span>
+                      <div className="text-lg font-bold text-neutral-dark">{formData.userName || 'Not provided'}</div>
+                    </div>
+                    <div className="bg-white rounded-2xl p-4">
+                      <span className="text-sm text-neutral-medium">Email</span>
+                      <div className="text-lg font-bold text-neutral-dark">{formData.userEmail || 'Not provided'}</div>
+                    </div>
+                    <div className="bg-white rounded-2xl p-4">
+                      <span className="text-sm text-neutral-medium">📅 Birth Date</span>
+                      <div className="text-lg font-bold text-neutral-dark">{formData.birthDate.toLocaleDateString()}</div>
+                    </div>
+                    <div className="bg-white rounded-2xl p-4">
+                      <span className="text-sm text-neutral-medium">⏰ Birth Time</span>
+                      <div className="text-lg font-bold text-neutral-dark">
+                        {String(formData.birthTime.hours).padStart(2, '0')}:
+                        {String(formData.birthTime.minutes).padStart(2, '0')}
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-2xl p-4">
+                      <span className="text-sm text-neutral-medium">⚖️ Weight</span>
+                      <div className="text-lg font-bold text-neutral-dark">{formData.weight} kg</div>
+                    </div>
+                    <div className="bg-white rounded-2xl p-4">
+                      <span className="text-sm text-neutral-medium">📏 Height</span>
+                      <div className="text-lg font-bold text-neutral-dark">{formData.height} cm</div>
+                    </div>
+                    <div className="bg-white rounded-2xl p-4">
+                      <span className="text-sm text-neutral-medium">👁️ Eye Color</span>
+                      <div className="text-lg font-bold text-neutral-dark capitalize">
+                        {EYE_COLORS.find((c) => c.id === formData.eyeColor)?.name}
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-2xl p-4">
+                      <span className="text-sm text-neutral-medium">💇 Hair Color</span>
+                      <div className="text-lg font-bold text-neutral-dark capitalize">
+                        {HAIR_COLORS.find((c) => c.id === formData.hairColor)?.name}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Error message */}
+              {submitStatus.type === 'error' && (
+                <div className="bg-red-50 border-2 border-red-200 text-red-700 px-6 py-4 rounded-2xl">
+                  {submitStatus.message}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Navigation buttons */}
-      <div className="flex gap-4 justify-between">
-        <button
-          onClick={handlePrevious}
-          disabled={currentStep === 0}
-          className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-200 ${
-            currentStep === 0
-              ? 'bg-neutral-light text-neutral-medium cursor-not-allowed'
-              : 'bg-white border-2 border-baby-blue text-baby-blue hover:bg-baby-blue hover:text-white shadow-md hover:shadow-lg'
-          }`}
-        >
-          ← Previous
-        </button>
-
-        <Link
-          href="/"
-          className="px-6 py-3 bg-neutral-light text-neutral-dark font-semibold rounded-2xl hover:bg-neutral-medium/20 transition-all duration-200"
-        >
-          Cancel
-        </Link>
-
-        {currentStep < steps.length - 1 ? (
+      {submitStatus.type !== 'success' && (
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-between">
           <button
-            onClick={handleNext}
-            disabled={currentStep === 0 && (!formData.userName || !formData.userEmail)}
-            className={`px-6 py-3 font-semibold rounded-2xl shadow-md transition-all duration-200 ${
-              currentStep === 0 && (!formData.userName || !formData.userEmail)
+            onClick={handlePrevious}
+            disabled={currentStep === 0}
+            className={`w-full sm:w-auto px-6 py-3 rounded-2xl font-semibold transition-all duration-200 ${
+              currentStep === 0
                 ? 'bg-neutral-light text-neutral-medium cursor-not-allowed'
-                : 'bg-baby-blue text-white hover:shadow-lg hover:scale-105'
+                : 'bg-white border-2 border-baby-blue text-baby-blue hover:bg-baby-blue hover:text-white shadow-md hover:shadow-lg'
             }`}
           >
-            Next →
+            ← Previous
           </button>
-        ) : (
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting || submitStatus.type === 'success'}
-            className={`px-8 py-3 font-bold rounded-2xl shadow-lg transition-all duration-200 ${
-              isSubmitting || submitStatus.type === 'success'
-                ? 'bg-neutral-light text-neutral-medium cursor-not-allowed'
-                : 'bg-gradient-to-r from-baby-blue to-baby-mint text-white hover:shadow-xl hover:scale-105'
-            }`}
-          >
-            {isSubmitting ? 'Submitting...' : submitStatus.type === 'success' ? 'Submitted ✓' : `${t('submitPrediction')} 🎉`}
-          </button>
-        )}
-      </div>
 
-      {/* Summary preview (shown on last step) */}
-      {currentStep === steps.length - 1 && (
-        <div className="mt-8 bg-baby-cream/30 rounded-3xl p-6 border-2 border-baby-cream">
-          <h3 className="text-lg font-heading font-bold text-neutral-dark mb-4 text-center">
-            📋 Your Prediction Summary
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-            <div className="col-span-2">
-              <span className="text-neutral-medium">Name:</span>
-              <div className="font-semibold">{formData.userName || 'Not provided'}</div>
-            </div>
-            <div className="col-span-2">
-              <span className="text-neutral-medium">Email:</span>
-              <div className="font-semibold">{formData.userEmail || 'Not provided'}</div>
-            </div>
-            <div>
-              <span className="text-neutral-medium">Date:</span>
-              <div className="font-semibold">{formData.birthDate.toLocaleDateString()}</div>
-            </div>
-            <div>
-              <span className="text-neutral-medium">Time:</span>
-              <div className="font-semibold">
-                {String(formData.birthTime.hours).padStart(2, '0')}:
-                {String(formData.birthTime.minutes).padStart(2, '0')}
-              </div>
-            </div>
-            <div>
-              <span className="text-neutral-medium">Weight:</span>
-              <div className="font-semibold">{formData.weight} kg</div>
-            </div>
-            <div>
-              <span className="text-neutral-medium">Height:</span>
-              <div className="font-semibold">{formData.height} cm</div>
-            </div>
-            <div>
-              <span className="text-neutral-medium">Eye Color:</span>
-              <div className="font-semibold">
-                {EYE_COLORS.find((c) => c.id === formData.eyeColor)?.name}
-              </div>
-            </div>
-            <div>
-              <span className="text-neutral-medium">Hair Color:</span>
-              <div className="font-semibold">
-                {HAIR_COLORS.find((c) => c.id === formData.hairColor)?.name}
-              </div>
-            </div>
-          </div>
+          <Link
+            href="/"
+            className="w-full sm:w-auto px-6 py-3 bg-neutral-light text-neutral-dark font-semibold rounded-2xl hover:bg-neutral-medium/20 transition-all duration-200 text-center"
+          >
+            Cancel
+          </Link>
+
+          {currentStep < steps.length - 1 ? (
+            <button
+              onClick={handleNext}
+              disabled={currentStep === 0 && (!formData.userName || !formData.userEmail)}
+              className={`w-full sm:w-auto px-6 py-3 font-semibold rounded-2xl shadow-md transition-all duration-200 ${
+                currentStep === 0 && (!formData.userName || !formData.userEmail)
+                  ? 'bg-neutral-light text-neutral-medium cursor-not-allowed'
+                  : 'bg-baby-blue text-white hover:shadow-lg hover:scale-105'
+              }`}
+            >
+              Next →
+            </button>
+          ) : (
+            <button
+              onClick={handleSubmit}
+              disabled={isSubmitting || submitStatus.type === 'success'}
+              className={`w-full sm:w-auto px-8 py-3 font-bold rounded-2xl shadow-lg transition-all duration-200 ${
+                isSubmitting || submitStatus.type === 'success'
+                  ? 'bg-neutral-light text-neutral-medium cursor-not-allowed'
+                  : 'bg-gradient-to-r from-baby-blue to-baby-mint text-white hover:shadow-xl hover:scale-105'
+              }`}
+            >
+              {isSubmitting ? 'Submitting...' : submitStatus.type === 'success' ? 'Submitted ✓' : `${t('submitPrediction')} 🎉`}
+            </button>
+          )}
         </div>
       )}
     </div>

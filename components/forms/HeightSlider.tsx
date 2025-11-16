@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 interface HeightSliderProps {
   value: number;
@@ -15,7 +15,8 @@ export function HeightSlider({ value, onChange, label }: HeightSliderProps) {
   };
 
   // Calculate baby silhouette height
-  const silhouetteHeight = 80 + ((value - minHeight) / (maxHeight - minHeight)) * 80; // 80px to 160px
+  const silhouetteHeight =
+    80 + ((value - minHeight) / (maxHeight - minHeight)) * 80; // 80px to 160px
 
   return (
     <div className="space-y-4">
@@ -53,7 +54,11 @@ export function HeightSlider({ value, onChange, label }: HeightSliderProps) {
           onChange={handleSliderChange}
           className="w-full h-3 bg-baby-blue/20 rounded-full appearance-none cursor-pointer slider-thumb-height"
           style={{
-            background: `linear-gradient(to right, #A8D5E2 0%, #A8D5E2 ${((value - minHeight) / (maxHeight - minHeight)) * 100}%, #E5E5E5 ${((value - minHeight) / (maxHeight - minHeight)) * 100}%, #E5E5E5 100%)`
+            background: `linear-gradient(to right, #A8D5E2 0%, #A8D5E2 ${
+              ((value - minHeight) / (maxHeight - minHeight)) * 100
+            }%, #E5E5E5 ${
+              ((value - minHeight) / (maxHeight - minHeight)) * 100
+            }%, #E5E5E5 100%)`,
           }}
         />
 
@@ -86,7 +91,7 @@ export function HeightSlider({ value, onChange, label }: HeightSliderProps) {
               transform: "translateX(-50%)",
             }}
           >
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-neutral-dark text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+            <div className="absolute left-1/2 -translate-x-1/2 bg-neutral-dark text-white text-xs px-2 py-1 rounded whitespace-nowrap">
               {value.toFixed(1)} cm
             </div>
           </div>
@@ -108,7 +113,7 @@ export function HeightSlider({ value, onChange, label }: HeightSliderProps) {
           width: 24px;
           height: 24px;
           border-radius: 50%;
-          background: #A8D5E2;
+          background: #a8d5e2;
           cursor: pointer;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
           border: 3px solid white;
@@ -123,7 +128,7 @@ export function HeightSlider({ value, onChange, label }: HeightSliderProps) {
           width: 24px;
           height: 24px;
           border-radius: 50%;
-          background: #A8D5E2;
+          background: #a8d5e2;
           cursor: pointer;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
           border: 3px solid white;

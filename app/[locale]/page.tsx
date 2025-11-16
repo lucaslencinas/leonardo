@@ -27,16 +27,16 @@ export default function HomePage() {
         <Countdown />
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center pt-8 w-full sm:w-auto">
           <Link
             href="/predict"
-            className="px-8 py-4 bg-baby-blue text-neutral-dark font-semibold rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 text-lg"
+            className="w-full sm:w-auto px-8 py-4 bg-baby-blue text-neutral-dark font-semibold rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 text-lg text-center"
           >
             {t('getStarted')}
           </Link>
           <Link
             href="/predictions"
-            className="px-8 py-4 bg-white border-2 border-baby-mint text-neutral-dark font-semibold rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 text-lg"
+            className="w-full sm:w-auto px-8 py-4 bg-white border-2 border-baby-mint text-neutral-dark font-semibold rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 text-lg text-center"
           >
             {t('viewPredictions')}
           </Link>

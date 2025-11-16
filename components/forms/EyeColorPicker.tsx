@@ -130,7 +130,7 @@ export function EyeColorPicker({ value, onChange, label }: EyeColorPickerProps) 
       )}
 
       {/* Color swatches */}
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 sm:gap-2">
         {EYE_COLORS.map((color) => (
           <button
             key={color.id}
