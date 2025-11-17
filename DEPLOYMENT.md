@@ -1,5 +1,7 @@
 # Deployment Guide - Baby Leo Prediction App
 
+**Production URL**: https://babyleo.vercel.app
+
 This guide will walk you through deploying the Baby Leo prediction webapp to Vercel with Postgres database.
 
 ## Prerequisites
@@ -114,9 +116,14 @@ You need to add environment variables for NextAuth.js:
 
    **NEXTAUTH_URL** (your production URL)
    ```
-   https://your-app-name.vercel.app
+   https://babyleo.vercel.app
    ```
-   (Replace with your actual Vercel URL after first deployment)
+
+   **NEXT_PUBLIC_SITE_URL** (for QR code generation)
+   ```
+   https://babyleo.vercel.app
+   ```
+   **Note**: Must start with `NEXT_PUBLIC_` to be available in browser
 
    **ADMIN_EMAIL** (for admin access)
    ```
@@ -182,15 +189,23 @@ vercel --prod
 
 ## Step 7: Verify Deployment
 
-1. **Visit your production URL**: `https://your-app-name.vercel.app`
+1. **Visit your production URL**: `https://babyleo.vercel.app`
 2. **Test the pages**:
    - Homepage with countdown: `/`
    - Prediction form: `/predict`
+   - All predictions: `/predictions`
+   - Admin dashboard: `/admin`
    - Results page: `/fake-end-results`
 
-3. **Check environment variables are working**:
+3. **Test QR Code Feature**:
+   - Go to `/admin`
+   - Click "Show QR Code"
+   - Verify it shows `babyleo.vercel.app`
+
+4. **Check environment variables are working**:
    - No database connection errors
-   - NextAuth is configured (needed for later auth features)
+   - Admin email login works
+   - QR code displays correct URL
 
 ---
 
@@ -231,6 +246,9 @@ NEXTAUTH_SECRET="your-generated-secret"
 
 # Admin
 ADMIN_EMAIL="lllencinas@gmail.com"
+
+# QR Code
+NEXT_PUBLIC_SITE_URL="https://babyleo.vercel.app"
 
 # Google OAuth (optional)
 GOOGLE_CLIENT_ID="your-google-client-id"

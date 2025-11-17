@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { addDays, formatDate } from '@/lib/utils';
 
 interface DateSliderProps {
@@ -13,6 +13,7 @@ interface DateSliderProps {
 
 export function DateSlider({ value, onChange, dueDate, label }: DateSliderProps) {
   const locale = useLocale();
+  const t = useTranslations('dateSlider');
 
   // Calculate date range: ±2 weeks from due date
   const minDate = addDays(dueDate, -14);
@@ -37,10 +38,10 @@ export function DateSlider({ value, onChange, dueDate, label }: DateSliderProps)
   // Calculate days difference from due date for display
   const daysFromDue = Math.round((value.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
   const daysText = daysFromDue === 0
-    ? 'Due Date'
+    ? t('dueDate')
     : daysFromDue > 0
-    ? `${daysFromDue} day${daysFromDue > 1 ? 's' : ''} after`
-    : `${Math.abs(daysFromDue)} day${Math.abs(daysFromDue) > 1 ? 's' : ''} before`;
+    ? t('dayAfter', { count: daysFromDue })
+    : t('dayBefore', { count: Math.abs(daysFromDue) });
 
   return (
     <div className="space-y-4">
@@ -74,9 +75,9 @@ export function DateSlider({ value, onChange, dueDate, label }: DateSliderProps)
 
         {/* Markers */}
         <div className="flex justify-between mt-2 text-xs text-neutral-medium px-1">
-          <span>-2 weeks</span>
-          <span className="font-semibold text-baby-blue">Due Date</span>
-          <span>+2 weeks</span>
+          <span>{t('twoWeeksBefore')}</span>
+          <span className="font-semibold text-baby-blue">{t('dueDate')}</span>
+          <span>{t('twoWeeksAfter')}</span>
         </div>
 
         {/* Date markers */}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { formatTime } from '@/lib/utils';
 
 interface TimeSliderProps {
@@ -12,6 +12,7 @@ interface TimeSliderProps {
 
 export function TimeSlider({ value, onChange, label }: TimeSliderProps) {
   const locale = useLocale();
+  const t = useTranslations('timeOfDay');
 
   // Convert time to minutes since midnight (0-1439)
   const timeToMinutes = (hours: number, minutes: number) => hours * 60 + minutes;
@@ -31,10 +32,10 @@ export function TimeSlider({ value, onChange, label }: TimeSliderProps) {
 
   // Determine period of day
   const getPeriodOfDay = (hours: number) => {
-    if (hours >= 5 && hours < 12) return { icon: '🌅', text: 'Morning' };
-    if (hours >= 12 && hours < 17) return { icon: '☀️', text: 'Afternoon' };
-    if (hours >= 17 && hours < 21) return { icon: '🌆', text: 'Evening' };
-    return { icon: '🌙', text: 'Night' };
+    if (hours >= 5 && hours < 12) return { icon: '🌅', text: t('morning') };
+    if (hours >= 12 && hours < 17) return { icon: '☀️', text: t('afternoon') };
+    if (hours >= 17 && hours < 21) return { icon: '🌆', text: t('evening') };
+    return { icon: '🌙', text: t('night') };
   };
 
   const period = getPeriodOfDay(value.hours);
@@ -93,10 +94,10 @@ export function TimeSlider({ value, onChange, label }: TimeSliderProps) {
       {/* Quick time buttons */}
       <div className="grid grid-cols-4 gap-2">
         {[
-          { label: 'Midnight', hours: 0, minutes: 0 },
-          { label: 'Morning', hours: 6, minutes: 0 },
-          { label: 'Noon', hours: 12, minutes: 0 },
-          { label: 'Evening', hours: 18, minutes: 0 },
+          { label: t('midnight'), hours: 0, minutes: 0 },
+          { label: t('morning'), hours: 6, minutes: 0 },
+          { label: t('noon'), hours: 12, minutes: 0 },
+          { label: t('evening'), hours: 18, minutes: 0 },
         ].map((time) => (
           <button
             key={time.label}

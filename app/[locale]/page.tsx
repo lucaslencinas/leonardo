@@ -31,9 +31,9 @@ export default function HomePage() {
       <div className="max-w-4xl mx-auto space-y-8 px-4">
         {/* Header with baby theme */}
         <div className="space-y-4">
-          <h1 className="text-5xl md:text-7xl font-heading font-bold text-neutral-dark tracking-tight">
-            <span className="baby-gradient bg-clip-text text-transparent">
-              Leonardo
+          <h1 className="text-5xl md:text-7xl font-heading font-bold tracking-tight">
+            <span className="bg-gradient-to-r from-baby-blue to-baby-mint bg-clip-text text-transparent">
+              Leo
             </span>
           </h1>
           <p className="text-2xl md:text-3xl font-heading text-baby-blue">
@@ -47,20 +47,18 @@ export default function HomePage() {
         {/* Info card about the game */}
         <div className="bg-gradient-to-br from-baby-blue/10 to-baby-mint/10 rounded-3xl p-6 border-2 border-baby-blue/20 max-w-2xl mx-auto">
           <h2 className="text-xl font-heading font-bold text-neutral-dark mb-3">
-            🎯 What is this?
+            🎯 {t('whatIsThis')}
           </h2>
           <p className="text-neutral-medium">
-            Family and friends are invited to predict Leonardo's birth details!
-            Guess the date, time, weight, height, eye color, and hair color.
-            The closest predictions win! 🏆
+            {t('gameDescription')}
           </p>
           {participantCount !== null && participantCount > 0 && (
             <div className="mt-4 pt-4 border-t border-baby-blue/20">
               <p className="text-2xl font-bold text-baby-blue">
-                {participantCount} {participantCount === 1 ? 'person has' : 'people have'} already predicted!
+                {t('peopleHavePredicted', { count: participantCount })}
               </p>
               <p className="text-sm text-neutral-medium mt-1">
-                Join the fun and make your prediction
+                {t('joinTheFun')}
               </p>
             </div>
           )}

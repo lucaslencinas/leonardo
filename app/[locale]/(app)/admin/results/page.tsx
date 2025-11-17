@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 import { DateSlider } from '@/components/forms/DateSlider';
 import { TimeSlider } from '@/components/forms/TimeSlider';
 import { WeightSlider } from '@/components/forms/WeightSlider';
@@ -21,6 +22,7 @@ interface ActualResultsData {
 
 export default function AdminResultsPage() {
   const router = useRouter();
+  const t = useTranslations();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
   const [isSaving, setSaving] = useState(false);
@@ -117,7 +119,7 @@ export default function AdminResultsPage() {
       if (response.ok) {
         setSaveStatus({
           type: 'success',
-          message: existingResults ? 'Results updated successfully!' : 'Results saved successfully!',
+          message: existingResults ? t('admin.resultsUpdatedSuccessfully') : t('admin.resultsSavedSuccessfully'),
         });
         setExistingResults(formData);
 
@@ -128,14 +130,14 @@ export default function AdminResultsPage() {
       } else {
         setSaveStatus({
           type: 'error',
-          message: data.error || 'Failed to save results',
+          message: data.error || t('admin.failedToSaveResults'),
         });
       }
     } catch (err) {
       console.error('Save error:', err);
       setSaveStatus({
         type: 'error',
-        message: 'An error occurred while saving',
+        message: t('admin.errorWhileSaving'),
       });
     } finally {
       setSaving(false);
@@ -145,7 +147,7 @@ export default function AdminResultsPage() {
   if (isChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-neutral-medium">Verifying access...</div>
+        <div className="text-xl text-neutral-medium">{t('admin.verifyingAccess')}</div>
       </div>
     );
   }
@@ -163,13 +165,13 @@ export default function AdminResultsPage() {
             onClick={() => router.push('/admin')}
             className="text-baby-blue hover:underline mb-4 text-sm font-semibold"
           >
-            ← Back to Dashboard
+            {t('admin.backToDashboard')}
           </button>
           <h1 className="text-3xl font-heading font-bold text-neutral-dark mb-2">
-            📝 Enter Actual Birth Results
+            {t('admin.enterActualBirthResults')}
           </h1>
           <p className="text-neutral-medium">
-            {existingResults ? 'Update the actual birth details below' : 'Enter the real birth details to calculate winners'}
+            {existingResults ? t('admin.updateActualBirthDetails') : t('admin.enterRealBirthDetails')}
           </p>
         </div>
 
@@ -184,7 +186,7 @@ export default function AdminResultsPage() {
               value={formData.birthDate}
               onChange={(date) => setFormData({ ...formData, birthDate: date })}
               dueDate={dueDate}
-              label="Actual birth date"
+              label={t('admin.actualBirthDate')}
             />
           </div>
 
@@ -196,7 +198,7 @@ export default function AdminResultsPage() {
             <TimeSlider
               value={formData.birthTime}
               onChange={(time) => setFormData({ ...formData, birthTime: time })}
-              label="Actual birth time"
+              label={t('admin.actualBirthTime')}
             />
           </div>
 
@@ -208,7 +210,7 @@ export default function AdminResultsPage() {
             <WeightSlider
               value={formData.weight}
               onChange={(weight) => setFormData({ ...formData, weight })}
-              label="Actual weight"
+              label={t('admin.actualWeight')}
             />
           </div>
 
@@ -220,7 +222,7 @@ export default function AdminResultsPage() {
             <HeightSlider
               value={formData.height}
               onChange={(height) => setFormData({ ...formData, height })}
-              label="Actual height"
+              label={t('admin.actualHeight')}
             />
           </div>
 
@@ -232,7 +234,7 @@ export default function AdminResultsPage() {
             <EyeColorPicker
               value={formData.eyeColor}
               onChange={(eyeColor: EyeColorId) => setFormData({ ...formData, eyeColor })}
-              label="Actual eye color"
+              label={t('admin.actualEyeColor')}
             />
           </div>
 
@@ -244,7 +246,7 @@ export default function AdminResultsPage() {
             <HairColorPicker
               value={formData.hairColor}
               onChange={(hairColor: HairColorId) => setFormData({ ...formData, hairColor })}
-              label="Actual hair color"
+              label={t('admin.actualHairColor')}
             />
           </div>
 
@@ -267,7 +269,7 @@ export default function AdminResultsPage() {
               onClick={() => router.push('/admin')}
               className="w-full sm:w-auto px-6 py-3 bg-neutral-light text-neutral-dark font-semibold rounded-2xl hover:bg-neutral-medium/20 transition-all duration-200 text-center"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               onClick={handleSave}
@@ -278,7 +280,7 @@ export default function AdminResultsPage() {
                   : 'bg-gradient-to-r from-baby-blue to-baby-mint text-white hover:shadow-xl hover:scale-105'
               }`}
             >
-              {isSaving ? 'Saving...' : saveStatus?.type === 'success' ? 'Saved ✓' : existingResults ? 'Update Results' : 'Save Results'}
+              {isSaving ? t('admin.saving') : saveStatus?.type === 'success' ? t('admin.savedCheckmark') : existingResults ? t('admin.updateResults') : t('admin.saveResults')}
             </button>
           </div>
         </div>
@@ -286,34 +288,34 @@ export default function AdminResultsPage() {
         {/* Summary */}
         <div className="mt-8 bg-baby-cream/30 rounded-3xl p-6 border-2 border-baby-cream">
           <h3 className="text-lg font-heading font-bold text-neutral-dark mb-4 text-center">
-            📋 Summary
+            {t('admin.summary')}
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
             <div>
-              <span className="text-neutral-medium">Date:</span>
+              <span className="text-neutral-medium">{t('admin.dateLabel')}</span>
               <div className="font-semibold">{formData.birthDate.toLocaleDateString()}</div>
             </div>
             <div>
-              <span className="text-neutral-medium">Time:</span>
+              <span className="text-neutral-medium">{t('admin.timeLabel')}</span>
               <div className="font-semibold">
                 {String(formData.birthTime.hours).padStart(2, '0')}:
                 {String(formData.birthTime.minutes).padStart(2, '0')}
               </div>
             </div>
             <div>
-              <span className="text-neutral-medium">Weight:</span>
+              <span className="text-neutral-medium">{t('admin.weight')}</span>
               <div className="font-semibold">{formData.weight} kg</div>
             </div>
             <div>
-              <span className="text-neutral-medium">Height:</span>
+              <span className="text-neutral-medium">{t('admin.height')}</span>
               <div className="font-semibold">{formData.height} cm</div>
             </div>
             <div>
-              <span className="text-neutral-medium">Eye Color:</span>
+              <span className="text-neutral-medium">{t('admin.eyeColor')}</span>
               <div className="font-semibold capitalize">{formData.eyeColor}</div>
             </div>
             <div>
-              <span className="text-neutral-medium">Hair Color:</span>
+              <span className="text-neutral-medium">{t('admin.hairColor')}</span>
               <div className="font-semibold capitalize">{formData.hairColor}</div>
             </div>
           </div>

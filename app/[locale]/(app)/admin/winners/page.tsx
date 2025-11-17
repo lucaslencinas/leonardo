@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 import { getMedal, getScoreColor, getScoreLabel, type ScoredPrediction } from '@/lib/winner-calculation';
 
 interface ActualResults {
@@ -15,6 +16,7 @@ interface ActualResults {
 
 export default function AdminWinnersPage() {
   const router = useRouter();
+  const t = useTranslations();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
@@ -68,11 +70,11 @@ export default function AdminWinnersPage() {
         setWinners(data.winners || []);
         setActualResults(data.actualResults);
       } else {
-        setError(data.error || 'Failed to load winners');
+        setError(data.error || t('admin.failedToSaveResults'));
       }
     } catch (err) {
       console.error('Failed to fetch winners:', err);
-      setError('An error occurred while loading winners');
+      setError(t('admin.errorWhileSaving'));
     } finally {
       setIsLoading(false);
     }
@@ -82,7 +84,7 @@ export default function AdminWinnersPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-xl text-neutral-medium">
-          {isChecking ? 'Verifying access...' : 'Calculating winners...'}
+          {isChecking ? t('admin.verifyingAccess') : t('admin.calculatingWinners')}
         </div>
       </div>
     );
@@ -101,13 +103,13 @@ export default function AdminWinnersPage() {
             onClick={() => router.push('/admin')}
             className="text-baby-blue hover:underline mb-4 text-sm font-semibold"
           >
-            ← Back to Dashboard
+            {t('admin.backToDashboard')}
           </button>
           <h1 className="text-3xl font-heading font-bold text-neutral-dark mb-2">
-            🏆 Winners & Leaderboard
+            {t('admin.winnersLeaderboard')}
           </h1>
           <p className="text-neutral-medium">
-            {actualResults ? 'Results calculated based on actual birth details' : 'No results entered yet'}
+            {actualResults ? t('admin.resultsCalculatedBasedOnActual') : t('admin.noResultsEnteredYet')}
           </p>
         </div>
 
@@ -119,13 +121,13 @@ export default function AdminWinnersPage() {
               {error}
             </h2>
             <p className="text-neutral-medium mb-6">
-              Please enter the actual birth results first
+              {t('admin.pleaseEnterActualResults')}
             </p>
             <button
               onClick={() => router.push('/admin/results')}
               className="px-6 py-3 bg-baby-blue text-white font-semibold rounded-2xl hover:shadow-lg hover:scale-105 transition-all duration-200"
             >
-              Enter Results
+              {t('admin.enterResults')}
             </button>
           </div>
         )}
@@ -134,33 +136,33 @@ export default function AdminWinnersPage() {
         {actualResults && (
           <div className="bg-gradient-to-r from-baby-blue to-baby-mint text-white rounded-3xl shadow-lg p-8 mb-8">
             <h2 className="text-2xl font-heading font-bold mb-6 text-center">
-              📋 Actual Birth Details
+              {t('admin.actualBirthDetails')}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
               <div className="bg-white/20 rounded-2xl p-4">
-                <div className="text-sm opacity-90 mb-1">Date</div>
+                <div className="text-sm opacity-90 mb-1">{t('predict.date')}</div>
                 <div className="text-lg font-bold">
                   {new Date(actualResults.birthDate).toLocaleDateString()}
                 </div>
               </div>
               <div className="bg-white/20 rounded-2xl p-4">
-                <div className="text-sm opacity-90 mb-1">Time</div>
+                <div className="text-sm opacity-90 mb-1">{t('predict.time')}</div>
                 <div className="text-lg font-bold">{actualResults.birthTime}</div>
               </div>
               <div className="bg-white/20 rounded-2xl p-4">
-                <div className="text-sm opacity-90 mb-1">Weight</div>
+                <div className="text-sm opacity-90 mb-1">{t('predict.weight')}</div>
                 <div className="text-lg font-bold">{actualResults.weight} kg</div>
               </div>
               <div className="bg-white/20 rounded-2xl p-4">
-                <div className="text-sm opacity-90 mb-1">Height</div>
+                <div className="text-sm opacity-90 mb-1">{t('predict.height')}</div>
                 <div className="text-lg font-bold">{actualResults.height} cm</div>
               </div>
               <div className="bg-white/20 rounded-2xl p-4">
-                <div className="text-sm opacity-90 mb-1">Eye Color</div>
+                <div className="text-sm opacity-90 mb-1">{t('predict.eyeColor')}</div>
                 <div className="text-lg font-bold capitalize">{actualResults.eyeColor}</div>
               </div>
               <div className="bg-white/20 rounded-2xl p-4">
-                <div className="text-sm opacity-90 mb-1">Hair Color</div>
+                <div className="text-sm opacity-90 mb-1">{t('predict.hairColor')}</div>
                 <div className="text-lg font-bold capitalize">{actualResults.hairColor}</div>
               </div>
             </div>
@@ -200,7 +202,7 @@ export default function AdminWinnersPage() {
                   {/* User Info */}
                   <div className="flex-1">
                     <div className="text-2xl font-heading font-bold text-neutral-dark mb-1">
-                      {winner.user.name || 'Anonymous'}
+                      {winner.user.name || t('admin.anonymous')}
                     </div>
                     <div className="text-sm text-neutral-medium mb-3">
                       {winner.user.email}
@@ -209,29 +211,29 @@ export default function AdminWinnersPage() {
                     {/* Score Breakdown */}
                     <div className="grid grid-cols-2 md:grid-cols-6 gap-2 text-xs">
                       <div className="bg-baby-cream/30 rounded-lg p-2">
-                        <div className="text-neutral-medium">Date</div>
+                        <div className="text-neutral-medium">{t('predict.date')}</div>
                         <div className="font-bold">{winner.breakdown.dateScore}pt</div>
                       </div>
                       <div className="bg-baby-cream/30 rounded-lg p-2">
-                        <div className="text-neutral-medium">Time</div>
+                        <div className="text-neutral-medium">{t('predict.time')}</div>
                         <div className="font-bold">{winner.breakdown.timeScore}pt</div>
                       </div>
                       <div className="bg-baby-cream/30 rounded-lg p-2">
-                        <div className="text-neutral-medium">Weight</div>
+                        <div className="text-neutral-medium">{t('predict.weight')}</div>
                         <div className="font-bold">{winner.breakdown.weightScore}pt</div>
                       </div>
                       <div className="bg-baby-cream/30 rounded-lg p-2">
-                        <div className="text-neutral-medium">Height</div>
+                        <div className="text-neutral-medium">{t('predict.height')}</div>
                         <div className="font-bold">{winner.breakdown.heightScore}pt</div>
                       </div>
                       <div className="bg-baby-cream/30 rounded-lg p-2">
-                        <div className="text-neutral-medium">Eyes</div>
+                        <div className="text-neutral-medium">{t('predict.eyes')}</div>
                         <div className="font-bold">
                           {winner.breakdown.eyeColorScore === 0 ? '✓' : '✗'}
                         </div>
                       </div>
                       <div className="bg-baby-cream/30 rounded-lg p-2">
-                        <div className="text-neutral-medium">Hair</div>
+                        <div className="text-neutral-medium">{t('predict.hair')}</div>
                         <div className="font-bold">
                           {winner.breakdown.hairColorScore === 0 ? '✓' : '✗'}
                         </div>
@@ -241,7 +243,7 @@ export default function AdminWinnersPage() {
 
                   {/* Total Score */}
                   <div className="text-center md:text-right">
-                    <div className="text-sm text-neutral-medium mb-1">Total Score</div>
+                    <div className="text-sm text-neutral-medium mb-1">{t('admin.totalScore')}</div>
                     <div className={`text-4xl font-heading font-bold ${getScoreColor(winner.score)}`}>
                       {winner.score}
                     </div>
@@ -257,10 +259,10 @@ export default function AdminWinnersPage() {
           <div className="bg-white rounded-3xl shadow-lg p-12 text-center">
             <div className="text-6xl mb-4">🎯</div>
             <h2 className="text-2xl font-heading font-bold text-neutral-dark mb-2">
-              No Predictions Yet
+              {t('admin.noPredictionsYetTitle')}
             </h2>
             <p className="text-neutral-medium">
-              Waiting for family and friends to submit their predictions
+              {t('admin.waitingForPredictions')}
             </p>
           </div>
         )}

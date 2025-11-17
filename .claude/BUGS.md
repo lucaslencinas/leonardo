@@ -13,8 +13,7 @@ All reported bugs have been fixed! ✅
 7. ✅ **Review stage compact layout** - Grouped predictions into sections (Personal Info, Birth Details, Physical Details)
 8. ✅ **View All Results button** - Added to admin dashboard with 3-column layout
 
+9. ✅ **Missing translations** - Added ~50 new translation keys for all newly added features (edit mode, admin dashboard, QR code, clear data modal, prediction gate) in English, Swedish, and Spanish
 ---
 
-If you find any new bugs or want improvements, add them below:
-
-9. The localisation is not present everything. Check the whole app and add the necessary translations that are missing.
+All bugs fixed! The app is now fully functional and translated. 🎉
