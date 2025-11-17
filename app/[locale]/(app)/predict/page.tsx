@@ -24,6 +24,7 @@ interface FormData {
 
 export default function PredictPage() {
   const t = useTranslations('predict');
+  const tCommon = useTranslations('common');
 
   // Due date: February 5, 2026 at 12:00 PM
   const dueDate = new Date('2026-02-05T12:00:00');
@@ -109,14 +110,14 @@ export default function PredictPage() {
   }, []);
 
   const steps = [
-    { id: 'user', label: 'Your Info', icon: '👤' },
-    { id: 'date', label: 'Birth Date', icon: '📅' },
-    { id: 'time', label: 'Birth Time', icon: '⏰' },
-    { id: 'weight', label: 'Weight', icon: '⚖️' },
-    { id: 'height', label: 'Height', icon: '📏' },
-    { id: 'eyes', label: 'Eye Color', icon: '👁️' },
-    { id: 'hair', label: 'Hair Color', icon: '💇' },
-    { id: 'review', label: 'Review', icon: '✓' },
+    { id: 'user', label: t('steps.yourInfo'), icon: '👤' },
+    { id: 'date', label: t('steps.birthDate'), icon: '📅' },
+    { id: 'time', label: t('steps.birthTime'), icon: '⏰' },
+    { id: 'weight', label: t('steps.weight'), icon: '⚖️' },
+    { id: 'height', label: t('steps.height'), icon: '📏' },
+    { id: 'eyes', label: t('steps.eyeColor'), icon: '👁️' },
+    { id: 'hair', label: t('steps.hairColor'), icon: '💇' },
+    { id: 'review', label: t('steps.review'), icon: '✓' },
   ];
 
   const handleNext = () => {
@@ -149,7 +150,7 @@ export default function PredictPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit prediction');
+        throw new Error(data.error || t('failedToSubmit'));
       }
 
       // Save email to localStorage to track that user has submitted
@@ -157,7 +158,7 @@ export default function PredictPage() {
 
       setSubmitStatus({
         type: 'success',
-        message: data.message || 'Prediction submitted successfully!',
+        message: data.message || t('successMessage'),
       });
 
       // Scroll to top to show success message
@@ -166,7 +167,7 @@ export default function PredictPage() {
       console.error('Error submitting prediction:', error);
       setSubmitStatus({
         type: 'error',
-        message: error instanceof Error ? error.message : 'An unexpected error occurred',
+        message: error instanceof Error ? error.message : t('unexpectedError'),
       });
 
       // Scroll to top to show error message
@@ -195,23 +196,23 @@ export default function PredictPage() {
         <div className="bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-300 rounded-3xl shadow-lg p-8 mb-8 text-center">
           <div className="text-6xl mb-4">🔒</div>
           <h2 className="text-2xl font-heading font-bold text-neutral-dark mb-2">
-            Submissions Are Closed
+            {t('submissionsClosedTitle')}
           </h2>
           <p className="text-lg text-neutral-medium mb-6">
-            We're no longer accepting new predictions. The baby has arrived or submissions have been locked by the administrator.
+            {t('submissionsClosedMessage')}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/"
               className="px-6 py-3 bg-white border-2 border-neutral-light text-neutral-dark font-semibold rounded-2xl hover:bg-neutral-light transition-all duration-200"
             >
-              ← Back to Home
+              {t('backToHome')}
             </Link>
             <Link
               href="/predictions"
               className="px-6 py-3 bg-baby-blue text-white font-semibold rounded-2xl hover:shadow-lg hover:scale-105 transition-all duration-200"
             >
-              View Predictions →
+              {tCommon('viewPredictions')}
             </Link>
           </div>
         </div>
@@ -225,10 +226,10 @@ export default function PredictPage() {
             <div className="bg-gradient-to-r from-baby-mint/20 to-baby-blue/20 border-2 border-baby-blue rounded-3xl shadow-md p-6 mb-8 text-center">
               <div className="text-4xl mb-2">✏️</div>
               <h3 className="text-xl font-heading font-bold text-neutral-dark mb-1">
-                You're Editing Your Prediction
+                {t('editingYourPrediction')}
               </h3>
               <p className="text-neutral-medium">
-                Your form has been pre-filled with your previous prediction. Make any changes you'd like and click "Update My Prediction" when you're done.
+                {t('editingDescription')}
               </p>
             </div>
           )}
@@ -277,7 +278,7 @@ export default function PredictPage() {
               />
             </div>
             <div className="text-center mt-2 text-sm text-neutral-medium">
-              Step {currentStep + 1} of {steps.length}
+              {t('stepCounter', { current: currentStep + 1, total: steps.length })}
             </div>
           </div>
 
@@ -289,22 +290,22 @@ export default function PredictPage() {
             <div className="space-y-6">
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-heading font-bold text-neutral-dark mb-2">
-                  👤 Tell us about yourself
+                  {t('userInfoTitle')}
                 </h2>
                 <p className="text-neutral-medium">
-                  We'll use this to identify your prediction
+                  {t('userInfoSubtitle')}
                 </p>
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-neutral-dark mb-2">
-                  Your Name
+                  {t('yourName')}
                 </label>
                 <input
                   type="text"
                   value={formData.userName}
                   onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
-                  placeholder="e.g., John Smith"
+                  placeholder={t('namePlaceholder')}
                   className="w-full px-4 py-3 border-2 border-neutral-light rounded-lg focus:border-baby-blue focus:outline-none transition-colors"
                   required
                 />
@@ -312,18 +313,18 @@ export default function PredictPage() {
 
               <div>
                 <label className="block text-sm font-semibold text-neutral-dark mb-2">
-                  Your Email
+                  {t('yourEmail')}
                 </label>
                 <input
                   type="email"
                   value={formData.userEmail}
                   onChange={(e) => setFormData({ ...formData, userEmail: e.target.value })}
-                  placeholder="your.email@example.com"
+                  placeholder={t('emailPlaceholder')}
                   className="w-full px-4 py-3 border-2 border-neutral-light rounded-lg focus:border-baby-blue focus:outline-none transition-colors"
                   required
                 />
                 <p className="mt-2 text-xs text-neutral-medium">
-                  We'll never share your email. One prediction per email.
+                  {t('emailNote')}
                 </p>
               </div>
             </div>
@@ -392,29 +393,29 @@ export default function PredictPage() {
                 <div className="text-center py-12">
                   <div className="text-8xl mb-6 animate-bounce">{isEditMode ? '✅' : '🎉'}</div>
                   <h2 className="text-3xl font-heading font-bold text-neutral-dark mb-4">
-                    {isEditMode ? 'Prediction Updated!' : 'Prediction Submitted!'}
+                    {isEditMode ? t('predictionUpdatedTitle') : t('predictionSubmittedTitle')}
                   </h2>
                   <p className="text-lg text-neutral-medium mb-8">
                     {isEditMode
-                      ? 'Your prediction has been successfully updated!'
-                      : 'Thank you for participating! Your prediction has been saved.'
+                      ? t('predictionUpdatedMessage')
+                      : t('predictionSubmittedMessage')
                     }
                   </p>
                   <Link
                     href="/predictions"
                     className="inline-block px-8 py-4 bg-baby-blue text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
                   >
-                    View all predictions →
+                    {t('viewAllPredictions')}
                   </Link>
                 </div>
               ) : (
                 <div className="text-center py-8">
                   <div className="text-6xl mb-4">📋</div>
                   <h2 className="text-2xl font-heading font-bold text-neutral-dark mb-2">
-                    Review Your Prediction
+                    {t('reviewYourPredictionTitle')}
                   </h2>
                   <p className="text-neutral-medium mb-8">
-                    Please check your prediction before submitting
+                    {t('reviewInstructions')}
                   </p>
                 </div>
               )}
@@ -423,19 +424,19 @@ export default function PredictPage() {
               {submitStatus.type !== 'success' && (
                 <div className="bg-baby-cream/30 rounded-3xl p-6 border-2 border-baby-cream space-y-4">
                   <h3 className="text-lg font-heading font-bold text-neutral-dark text-center">
-                    Your Prediction Summary
+                    {t('predictionSummary')}
                   </h3>
 
                   {/* Personal Info Section */}
                   <div className="bg-white rounded-2xl p-4">
-                    <h4 className="text-xs font-semibold text-neutral-medium uppercase mb-2">Personal Info</h4>
+                    <h4 className="text-xs font-semibold text-neutral-medium uppercase mb-2">{t('personalInfo')}</h4>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <span className="text-xs text-neutral-medium">Name</span>
+                        <span className="text-xs text-neutral-medium">{t('name')}</span>
                         <div className="text-base font-bold text-neutral-dark">{formData.userName}</div>
                       </div>
                       <div>
-                        <span className="text-xs text-neutral-medium">Email</span>
+                        <span className="text-xs text-neutral-medium">{t('email')}</span>
                         <div className="text-base font-bold text-neutral-dark truncate">{formData.userEmail}</div>
                       </div>
                     </div>
@@ -443,14 +444,14 @@ export default function PredictPage() {
 
                   {/* Birth Details Section */}
                   <div className="bg-white rounded-2xl p-4">
-                    <h4 className="text-xs font-semibold text-neutral-medium uppercase mb-2">Birth Details</h4>
+                    <h4 className="text-xs font-semibold text-neutral-medium uppercase mb-2">{t('birthDetails')}</h4>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <span className="text-xs text-neutral-medium">📅 Date</span>
+                        <span className="text-xs text-neutral-medium">{t('dateLabel')}</span>
                         <div className="text-base font-bold text-neutral-dark">{formData.birthDate.toLocaleDateString()}</div>
                       </div>
                       <div>
-                        <span className="text-xs text-neutral-medium">⏰ Time</span>
+                        <span className="text-xs text-neutral-medium">{t('timeLabel')}</span>
                         <div className="text-base font-bold text-neutral-dark">
                           {String(formData.birthTime.hours).padStart(2, '0')}:{String(formData.birthTime.minutes).padStart(2, '0')}
                         </div>
@@ -460,24 +461,24 @@ export default function PredictPage() {
 
                   {/* Physical Details Section */}
                   <div className="bg-white rounded-2xl p-4">
-                    <h4 className="text-xs font-semibold text-neutral-medium uppercase mb-2">Physical Details</h4>
+                    <h4 className="text-xs font-semibold text-neutral-medium uppercase mb-2">{t('physicalDetails')}</h4>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       <div>
-                        <span className="text-xs text-neutral-medium">⚖️ Weight</span>
-                        <div className="text-base font-bold text-neutral-dark">{formData.weight} kg</div>
+                        <span className="text-xs text-neutral-medium">{t('weightLabel')}</span>
+                        <div className="text-base font-bold text-neutral-dark">{formData.weight} {t('weightUnit')}</div>
                       </div>
                       <div>
-                        <span className="text-xs text-neutral-medium">📏 Height</span>
-                        <div className="text-base font-bold text-neutral-dark">{formData.height} cm</div>
+                        <span className="text-xs text-neutral-medium">{t('heightLabel')}</span>
+                        <div className="text-base font-bold text-neutral-dark">{formData.height} {t('heightUnit')}</div>
                       </div>
                       <div>
-                        <span className="text-xs text-neutral-medium">👁️ Eyes</span>
+                        <span className="text-xs text-neutral-medium">{t('eyesLabel')}</span>
                         <div className="text-base font-bold text-neutral-dark capitalize">
                           {EYE_COLORS.find((c) => c.id === formData.eyeColor)?.name}
                         </div>
                       </div>
                       <div>
-                        <span className="text-xs text-neutral-medium">💇 Hair</span>
+                        <span className="text-xs text-neutral-medium">{t('hairLabel')}</span>
                         <div className="text-base font-bold text-neutral-dark capitalize">
                           {HAIR_COLORS.find((c) => c.id === formData.hairColor)?.name}
                         </div>
@@ -507,7 +508,7 @@ export default function PredictPage() {
               onClick={handlePrevious}
               className="w-full sm:w-auto px-6 py-3 rounded-2xl font-semibold transition-all duration-200 bg-white border-2 border-baby-blue text-baby-blue hover:bg-baby-blue hover:text-white shadow-md hover:shadow-lg"
             >
-              ← Previous
+              ← {t('previous')}
             </button>
           )}
 
@@ -516,7 +517,7 @@ export default function PredictPage() {
             href="/"
             className="w-full sm:w-auto px-6 py-3 bg-neutral-light text-neutral-dark font-semibold rounded-2xl hover:bg-neutral-medium/20 transition-all duration-200 text-center"
           >
-            Cancel
+            {tCommon('cancel')}
           </Link>
 
           {/* Next button - shown on all steps except last */}
@@ -530,7 +531,7 @@ export default function PredictPage() {
                   : 'bg-baby-blue text-white hover:shadow-lg hover:scale-105'
               }`}
             >
-              Next →
+              {t('next')} →
             </button>
           ) : (
             /* Submit button - shown only on last step */
@@ -544,8 +545,8 @@ export default function PredictPage() {
               }`}
             >
               {isSubmitting
-                ? (isEditMode ? 'Updating...' : 'Submitting...')
-                : (isEditMode ? 'Update My Prediction ✏️' : `${t('submitPrediction')} 🎉`)
+                ? (isEditMode ? t('updating') : t('submitting'))
+                : (isEditMode ? `${t('editPrediction')} ✏️` : `${t('submitPrediction')} 🎉`)
               }
             </button>
           )}
@@ -558,7 +559,7 @@ export default function PredictPage() {
       {isCheckingLock && (
         <div className="bg-white rounded-3xl shadow-lg p-12 text-center">
           <div className="text-6xl mb-4">⏳</div>
-          <p className="text-lg text-neutral-medium">Checking submission status...</p>
+          <p className="text-lg text-neutral-medium">{t('checkingSubmissionStatus')}</p>
         </div>
       )}
     </div>

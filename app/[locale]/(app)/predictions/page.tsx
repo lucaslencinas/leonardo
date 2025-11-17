@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { DateResultsView } from '@/components/results/DateResultsView';
 import { TimeResultsView } from '@/components/results/TimeResultsView';
 import { WeightResultsView } from '@/components/results/WeightResultsView';
@@ -27,6 +28,8 @@ interface Prediction {
 }
 
 export default function PredictionsPage() {
+  const t = useTranslations('predictions');
+  const tCommon = useTranslations('common');
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +47,7 @@ export default function PredictionsPage() {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to fetch predictions');
+          throw new Error(data.error || t('failedToFetch'));
         }
 
         const allPredictions = data.predictions || [];
@@ -63,7 +66,7 @@ export default function PredictionsPage() {
         setPredictions(allPredictions);
       } catch (err) {
         console.error('Error fetching predictions:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load predictions');
+        setError(err instanceof Error ? err.message : t('failedToLoad'));
       } finally {
         setIsLoading(false);
       }
@@ -94,7 +97,7 @@ export default function PredictionsPage() {
           <div className="text-center py-20">
             <div className="text-6xl mb-4">⏳</div>
             <h2 className="text-2xl font-heading font-bold text-neutral-dark">
-              Loading predictions...
+              {t('loadingPredictions')}
             </h2>
           </div>
         </div>
@@ -109,14 +112,14 @@ export default function PredictionsPage() {
           <div className="text-center py-20">
             <div className="text-6xl mb-4">😕</div>
             <h2 className="text-2xl font-heading font-bold text-neutral-dark mb-4">
-              Oops! Something went wrong
+              {t('somethingWentWrong')}
             </h2>
             <p className="text-neutral-medium mb-6">{error}</p>
             <Link
               href="/"
               className="inline-block px-6 py-3 bg-baby-blue text-white font-semibold rounded-2xl hover:shadow-lg transition-all"
             >
-              Go Home
+              {t('goHome')}
             </Link>
           </div>
         </div>
@@ -132,26 +135,26 @@ export default function PredictionsPage() {
           <div className="text-center py-20">
             <div className="text-8xl mb-6">🔒</div>
             <h2 className="text-3xl font-heading font-bold text-neutral-dark mb-4">
-              Submit Your Prediction First!
+              {t('gateTitle')}
             </h2>
             <p className="text-lg text-neutral-medium mb-2 max-w-2xl mx-auto">
-              To keep it fair and fun, you need to make your own prediction before seeing what others guessed.
+              {t('gateMessage')}
             </p>
             <p className="text-neutral-medium mb-8">
-              <strong>{predictions.length}</strong> {predictions.length === 1 ? 'person has' : 'people have'} already predicted!
+              {t('gateCount', { count: predictions.length })}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
                 href="/predict"
                 className="px-8 py-4 bg-gradient-to-r from-baby-blue to-baby-mint text-white font-bold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all text-lg"
               >
-                Make Your Prediction 🎉
+                {t('makePrediction')} 🎉
               </Link>
               <Link
                 href="/"
                 className="px-8 py-4 bg-white border-2 border-neutral-light text-neutral-dark font-semibold rounded-2xl hover:shadow-lg hover:scale-105 transition-all text-lg"
               >
-                ← Back to Home
+                {t('backToHomeLink')}
               </Link>
             </div>
           </div>
@@ -167,16 +170,16 @@ export default function PredictionsPage() {
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🤔</div>
             <h2 className="text-2xl font-heading font-bold text-neutral-dark mb-4">
-              No predictions yet!
+              {t('noPredictionsYetTitle')}
             </h2>
             <p className="text-neutral-medium mb-6">
-              Be the first to predict Baby Leo's arrival details
+              {t('beTheFirst')}
             </p>
             <Link
               href="/predict"
               className="inline-block px-8 py-3 bg-gradient-to-r from-baby-blue to-baby-mint text-white font-bold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all"
             >
-              Make Your Prediction 🎉
+              {t('makePrediction')}
             </Link>
           </div>
         </div>
@@ -193,18 +196,18 @@ export default function PredictionsPage() {
             href="/"
             className="inline-block text-baby-blue hover:text-baby-blue/70 mb-4"
           >
-            ← Back to Home
+            {tCommon('backToHome')}
           </Link>
           <h1 className="text-5xl md:text-6xl font-heading font-bold text-neutral-dark">
-            Baby Leo Predictions
+            {t('pageTitle')}
           </h1>
           <p className="text-xl text-neutral-medium">
-            Everyone's predictions at a glance
+            {t('pageSubtitle')}
           </p>
           <div className="inline-flex items-center gap-2 bg-baby-blue/20 px-6 py-3 rounded-full">
             <span className="text-2xl">👥</span>
             <span className="text-lg font-semibold text-neutral-dark">
-              {predictions.length} prediction{predictions.length !== 1 ? 's' : ''} submitted
+              {t('predictionsSubmitted', { count: predictions.length })}
             </span>
           </div>
         </div>
@@ -215,7 +218,7 @@ export default function PredictionsPage() {
             href="/predict"
             className="inline-block px-8 py-3 bg-gradient-to-r from-baby-blue to-baby-mint text-white font-bold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all"
           >
-            Add Your Prediction 🎉
+            {t('addYourPrediction')}
           </Link>
         </div>
 
@@ -243,7 +246,7 @@ export default function PredictionsPage() {
             href="/predict"
             className="inline-block px-8 py-3 bg-gradient-to-r from-baby-blue to-baby-mint text-white font-bold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all"
           >
-            Add Your Prediction 🎉
+            {t('addYourPrediction')}
           </Link>
         </div>
       </div>

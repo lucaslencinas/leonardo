@@ -62,11 +62,11 @@ export default function AdminPage() {
         setAdminUser(data.user);
         localStorage.setItem('adminEmail', emailToCheck);
       } else {
-        setError(data.message || 'Access denied');
+        setError(data.message || t('accessDeniedError'));
         localStorage.removeItem('adminEmail');
       }
     } catch (err) {
-      setError('Failed to verify admin access');
+      setError(t('failedToVerifyAccess'));
       console.error(err);
     } finally {
       setIsChecking(false);
@@ -96,8 +96,8 @@ export default function AdminPage() {
         setStats({
           totalPredictions: predictions.length,
           predictors: predictions.map((p: any) => ({
-            name: p.user?.name || 'Unknown',
-            email: p.user?.email || 'No email',
+            name: p.user?.name || t('unknownUser'),
+            email: p.user?.email || t('noEmail'),
           })),
         });
       }
@@ -160,13 +160,13 @@ export default function AdminPage() {
         // Refresh stats after clearing
         await fetchStats();
         setShowClearConfirm(false);
-        alert('All data cleared successfully!');
+        alert(t('allDataCleared'));
       } else {
-        alert('Failed to clear data: ' + data.error);
+        alert(t('failedToClearData') + data.error);
       }
     } catch (err) {
       console.error('Failed to clear data:', err);
-      alert('An error occurred while clearing data');
+      alert(t('errorWhileClearing'));
     } finally {
       setIsClearingData(false);
     }
@@ -179,24 +179,24 @@ export default function AdminPage() {
         <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 border-2 border-baby-blue/20">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-heading font-bold text-neutral-dark mb-2">
-              🔐 Admin Access
+              {t('adminAccessTitle')}
             </h1>
             <p className="text-neutral-medium">
-              Enter your admin email to continue
+              {t('adminAccessDescription')}
             </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-semibold text-neutral-dark mb-2">
-                Email Address
+                {t('emailAddressLabel')}
               </label>
               <input
                 type="email"
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="your.email@example.com"
+                placeholder={t('emailPlaceholder')}
                 required
                 className="w-full px-4 py-3 rounded-xl border-2 border-neutral-light focus:border-baby-blue focus:outline-none transition-colors"
               />
@@ -217,7 +217,7 @@ export default function AdminPage() {
                   : 'bg-baby-blue text-white hover:shadow-lg hover:scale-105'
               }`}
             >
-              {isChecking ? 'Checking...' : 'Verify Admin Access'}
+              {isChecking ? t('checkingAccess') : t('verifyAccess')}
             </button>
           </form>
 
@@ -226,7 +226,7 @@ export default function AdminPage() {
               href="/"
               className="text-sm text-baby-blue hover:underline"
             >
-              ← Back to Home
+              {t('backToHomeLink')}
             </a>
           </div>
         </div>
@@ -243,17 +243,17 @@ export default function AdminPage() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h1 className="text-3xl font-heading font-bold text-neutral-dark mb-1">
-                👑 Admin Dashboard
+                {t('dashboardTitle')}
               </h1>
               <p className="text-neutral-medium">
-                Welcome, {adminUser?.name || adminUser?.email}
+                {t('welcomeUser', { name: adminUser?.name || adminUser?.email || '' })}
               </p>
             </div>
             <button
               onClick={handleLogout}
               className="px-6 py-2 bg-neutral-light text-neutral-dark rounded-xl hover:bg-neutral-medium/20 transition-colors text-sm font-semibold"
             >
-              Logout
+              {t('logoutButton')}
             </button>
           </div>
         </div>
@@ -263,12 +263,12 @@ export default function AdminPage() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h2 className="text-xl font-heading font-bold text-neutral-dark mb-1">
-                🔒 Submission Control
+                {t('submissionControlTitle')}
               </h2>
               <p className="text-neutral-medium text-sm">
                 {submissionsLocked
-                  ? 'Submissions are currently locked. No new predictions can be submitted.'
-                  : 'Submissions are open. Users can submit predictions.'}
+                  ? t('submissionsLockedText')
+                  : t('submissionsOpenText')}
               </p>
             </div>
             <button
@@ -282,7 +282,7 @@ export default function AdminPage() {
                   : 'bg-red-600 text-white hover:bg-red-700 hover:scale-105'
               }`}
             >
-              {isTogglingLock ? 'Updating...' : submissionsLocked ? '🔓 Unlock Submissions' : '🔒 Lock Submissions'}
+              {isTogglingLock ? t('updatingStatus') : submissionsLocked ? t('unlockSubmissionsButton') : t('lockSubmissionsButton')}
             </button>
           </div>
         </div>
@@ -291,13 +291,13 @@ export default function AdminPage() {
         <div className="bg-white rounded-3xl shadow-lg p-6 mb-8 border-2 border-baby-blue/20">
           <div className="mb-4">
             <h2 className="text-xl font-heading font-bold text-neutral-dark mb-1">
-              📱 Share via QR Code
+              📱 {t('shareViaQRCode')}
             </h2>
             <p className="text-neutral-medium text-sm">
-              Generate a QR code for your production website. Perfect for sharing in person!
+              {t('shareDescription')}
             </p>
           </div>
-          <QRCodeGenerator url={process.env.NEXT_PUBLIC_SITE_URL || 'https://your-site.vercel.app'} />
+          <QRCodeGenerator url={process.env.NEXT_PUBLIC_SITE_URL || 'https://babyleo.vercel.app'} />
         </div>
 
         {/* Clear All Data Control */}
@@ -305,17 +305,17 @@ export default function AdminPage() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h2 className="text-xl font-heading font-bold text-neutral-dark mb-1">
-                🗑️ Clear All Data
+                🗑️ {t('clearAllData')}
               </h2>
               <p className="text-neutral-medium text-sm">
-                Permanently delete all predictions, results, and user data. This action cannot be undone!
+                {t('clearAllDataDescription')}
               </p>
             </div>
             <button
               onClick={() => setShowClearConfirm(true)}
               className="px-6 py-3 rounded-xl font-semibold bg-red-600 text-white hover:bg-red-700 hover:scale-105 transition-all duration-200"
             >
-              🗑️ Clear All Data
+              🗑️ {t('clearAllData')}
             </button>
           </div>
         </div>
@@ -327,18 +327,13 @@ export default function AdminPage() {
               <div className="text-center mb-6">
                 <div className="text-6xl mb-4">⚠️</div>
                 <h2 className="text-2xl font-heading font-bold text-neutral-dark mb-2">
-                  Are you absolutely sure?
+                  {t('areYouSure')}
                 </h2>
                 <p className="text-neutral-medium">
-                  This will permanently delete:
+                  {t('deleteAllPredictions')}
                 </p>
-                <ul className="text-left mt-4 space-y-2 text-neutral-dark">
-                  <li>• All {stats?.totalPredictions || 0} predictions</li>
-                  <li>• All actual results</li>
-                  <li>• All user data (except admin)</li>
-                </ul>
                 <p className="text-red-600 font-semibold mt-4">
-                  This action cannot be undone!
+                  {t('cannotBeUndone')}
                 </p>
               </div>
               <div className="flex gap-3">
@@ -347,7 +342,7 @@ export default function AdminPage() {
                   disabled={isClearingData}
                   className="flex-1 px-6 py-3 rounded-xl font-semibold bg-neutral-light text-neutral-dark hover:bg-neutral-medium/20 transition-all duration-200"
                 >
-                  Cancel
+                  {t('cancelButton')}
                 </button>
                 <button
                   onClick={handleClearAllData}
@@ -358,7 +353,7 @@ export default function AdminPage() {
                       : 'bg-red-600 text-white hover:bg-red-700 hover:scale-105'
                   }`}
                 >
-                  {isClearingData ? 'Clearing...' : 'Yes, Clear All'}
+                  {isClearingData ? t('clearing') : t('confirmDeleteButton')}
                 </button>
               </div>
             </div>
@@ -372,7 +367,7 @@ export default function AdminPage() {
               {stats?.predictors.length || 0}
             </div>
             <div className="text-neutral-medium font-semibold">
-              Participants
+              {t('participants')}
             </div>
           </div>
 
@@ -381,7 +376,7 @@ export default function AdminPage() {
               0
             </div>
             <div className="text-neutral-medium font-semibold">
-              Winners (Not Calculated)
+              {t('winnersNotCalculatedText')}
             </div>
           </div>
         </div>
@@ -396,10 +391,10 @@ export default function AdminPage() {
             <div className="relative z-10">
               <div className="text-5xl mb-4">📊</div>
               <h2 className="text-2xl font-heading font-bold mb-2 text-white drop-shadow-md">
-                View All Predictions
+                {t('viewAllPredictionsCard')}
               </h2>
               <p className="text-white drop-shadow">
-                See everyone's predictions and statistics
+                {t('seeEveryonePredictionsText')}
               </p>
             </div>
           </button>
@@ -412,10 +407,10 @@ export default function AdminPage() {
             <div className="relative z-10">
               <div className="text-5xl mb-4">📝</div>
               <h2 className="text-2xl font-heading font-bold mb-2 text-white drop-shadow-md">
-                Enter Actual Results
+                {t('enterActualResultsCard')}
               </h2>
               <p className="text-white drop-shadow">
-                Record the real birth details to calculate winners
+                {t('recordRealBirthDetailsText')}
               </p>
             </div>
           </button>
@@ -428,10 +423,10 @@ export default function AdminPage() {
             <div className="relative z-10">
               <div className="text-5xl mb-4">🏆</div>
               <h2 className="text-2xl font-heading font-bold mb-2 text-white drop-shadow-md">
-                View Winners
+                {t('viewWinnersCard')}
               </h2>
               <p className="text-white drop-shadow">
-                See the leaderboard and announce winners
+                {t('seeLeaderboardText')}
               </p>
             </div>
           </button>
@@ -441,17 +436,17 @@ export default function AdminPage() {
         {stats && stats.predictors.length > 0 && (
           <div className="bg-white rounded-3xl shadow-lg p-6 border-2 border-baby-blue/20">
             <h2 className="text-2xl font-heading font-bold text-neutral-dark mb-4">
-              👥 Participants ({stats.predictors.length})
+              {t('participantsListTitle', { count: stats.predictors.length })}
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b-2 border-neutral-light">
                     <th className="text-left py-3 px-4 text-neutral-medium font-semibold">
-                      Name
+                      {t('nameColumn')}
                     </th>
                     <th className="text-left py-3 px-4 text-neutral-medium font-semibold">
-                      Email
+                      {t('emailColumn')}
                     </th>
                   </tr>
                 </thead>
