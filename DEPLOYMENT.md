@@ -1,344 +1,320 @@
-# Deployment Guide - Baby Leo Prediction App
+# Deployment Guide - Leonardo Baby Prediction App
 
-**Production URL**: https://babyleo.vercel.app
-
-This guide will walk you through deploying the Baby Leo prediction webapp to Vercel with Postgres database.
+This guide walks you through deploying the Leonardo app to Vercel with a Postgres database.
 
 ## Prerequisites
 
 - GitHub account
-- Vercel account (free tier is fine)
-- This repository pushed to GitHub
+- Vercel account (free tier works)
+- Repository pushed to GitHub
 
----
+## Quick Deploy (15 minutes)
 
-## Step 1: Push Code to GitHub
-
-If you haven't already:
+### 1. Push to GitHub
 
 ```bash
-git init
 git add .
-git commit -m "Initial commit: Baby Leo prediction app"
-git branch -M main
-git remote add origin <your-github-repo-url>
-git push -u origin main
+git commit -m "Ready for deployment"
+git push origin main
 ```
 
----
+### 2. Deploy to Vercel
 
-## Step 2: Deploy to Vercel
+1. Go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository
+3. Click **Deploy** (initial deployment will succeed but app needs database)
 
-### Option A: Using Vercel Dashboard (Recommended for first time)
+### 3. Add Postgres Database
 
-1. **Go to [vercel.com](https://vercel.com)** and sign in
-2. Click **"Add New..."** → **"Project"**
-3. **Import your GitHub repository**:
-   - Select your GitHub account
-   - Find `leonardo` repository
-   - Click **"Import"**
+In your Vercel project dashboard:
 
-4. **Configure Project**:
-   - **Framework Preset**: Next.js (should auto-detect)
-   - **Root Directory**: `./` (leave as is)
-   - **Build Command**: `npm run build` (auto-filled)
-   - **Output Directory**: `.next` (auto-filled)
-   - **Install Command**: `npm install` (auto-filled)
+1. Go to **Storage** tab
+2. Click **Create Database**
+3. Select **Postgres**
+4. Choose a region close to your users
+5. Click **Create**
 
-5. Click **"Deploy"** (without adding environment variables yet)
-   - First deployment will succeed but app won't work without database
+Vercel automatically adds these environment variables:
+- `DATABASE_URL`
+- `POSTGRES_PRISMA_URL`
+- `POSTGRES_URL`
+- `POSTGRES_URL_NON_POOLING`
+- And more...
 
-### Option B: Using Vercel CLI
+### 4. Add Required Environment Variables
+
+Go to **Settings** → **Environment Variables** and add:
+
+#### NEXTAUTH_SECRET
+Generate a secret:
+```bash
+openssl rand -base64 32
+# or
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+- Name: `NEXTAUTH_SECRET`
+- Value: (paste the generated secret)
+- Environment: Production, Preview, Development
+
+#### NEXTAUTH_URL
+- Name: `NEXTAUTH_URL`
+- Value: `https://your-project-name.vercel.app`
+- Environment: Production
+
+#### NEXT_PUBLIC_SITE_URL
+- Name: `NEXT_PUBLIC_SITE_URL`
+- Value: `https://your-project-name.vercel.app`
+- Environment: Production, Preview
+
+#### ADMIN_EMAIL
+- Name: `ADMIN_EMAIL`
+- Value: `your-admin-email@example.com`
+- Environment: Production, Preview, Development
+
+### 5. Push Database Schema
+
+**Option A: Using Vercel CLI (Recommended)**
 
 ```bash
-# Install Vercel CLI globally
+# Install Vercel CLI
 npm i -g vercel
 
-# Login to Vercel
+# Login
 vercel login
 
-# Deploy (run from project root)
-vercel
+# Link to your project
+vercel link
 
-# Follow the prompts:
-# - Set up and deploy? Y
-# - Which scope? (select your account)
-# - Link to existing project? N
-# - What's your project's name? leonardo (or your preferred name)
-# - In which directory is your code located? ./
-# - Want to override the settings? N
-
-# Deploy to production
-vercel --prod
-```
-
----
-
-## Step 3: Set Up Vercel Postgres Database
-
-1. **Go to your project dashboard** on Vercel
-2. Click on the **"Storage"** tab
-3. Click **"Create Database"**
-4. Select **"Postgres"** (powered by Neon)
-5. Choose a region close to your users (e.g., US East if most users are in Americas)
-6. Click **"Create"**
-
-Vercel will automatically:
-- Create the Postgres database
-- Add environment variables to your project:
-  - `POSTGRES_URL`
-  - `POSTGRES_PRISMA_URL`
-  - `POSTGRES_URL_NON_POOLING`
-  - `POSTGRES_USER`
-  - `POSTGRES_HOST`
-  - `POSTGRES_PASSWORD`
-  - `POSTGRES_DATABASE`
-
----
-
-## Step 4: Add Additional Environment Variables
-
-You need to add environment variables for NextAuth.js:
-
-1. **Go to Project Settings** → **Environment Variables**
-
-2. **Add these variables**:
-
-   **NEXTAUTH_SECRET** (required for production)
-   ```bash
-   # Generate a secret key:
-   openssl rand -base64 32
-
-   # Or use this command:
-   node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
-   ```
-   - Copy the output and add as `NEXTAUTH_SECRET`
-
-   **NEXTAUTH_URL** (your production URL)
-   ```
-   https://babyleo.vercel.app
-   ```
-
-   **NEXT_PUBLIC_SITE_URL** (for QR code generation)
-   ```
-   https://babyleo.vercel.app
-   ```
-   **Note**: Must start with `NEXT_PUBLIC_` to be available in browser
-
-   **ADMIN_EMAIL** (for admin access)
-   ```
-   lllencinas@gmail.com
-   ```
-
-3. **For Google OAuth** (optional, add later if needed):
-   - `GOOGLE_CLIENT_ID`
-   - `GOOGLE_CLIENT_SECRET`
-
-   Get these from [Google Cloud Console](https://console.cloud.google.com/)
-
----
-
-## Step 5: Push Database Schema
-
-After environment variables are set:
-
-### Option A: Using Vercel CLI
-
-```bash
-# Pull environment variables locally
+# Pull environment variables
 vercel env pull .env.local
 
-# Push Prisma schema to database
+# Generate Prisma client and push schema
+npx prisma generate
 npx prisma db push
-
-# Optional: Open Prisma Studio to verify
-npx prisma studio
 ```
 
-### Option B: Using Vercel Project Settings
+**Option B: Manual Setup**
 
-1. Go to **Project Settings** → **Environment Variables**
+1. Go to **Settings** → **Environment Variables** in Vercel
 2. Copy the `POSTGRES_PRISMA_URL` value
-3. Add to your local `.env.local` file:
-   ```
-   DATABASE_URL="your-postgres-prisma-url"
-   ```
-4. Run locally:
+3. Create `.env.local` locally:
    ```bash
+   DATABASE_URL="<paste-postgres-prisma-url-here>"
+   ```
+4. Push schema:
+   ```bash
+   npx prisma generate
    npx prisma db push
    ```
 
----
+### 6. Redeploy
 
-## Step 6: Redeploy
-
-After setting up environment variables and database:
-
-### Using Vercel Dashboard:
+**Via Vercel Dashboard:**
 - Go to **Deployments** tab
-- Click **"Redeploy"** on the latest deployment
-- Check **"Use existing Build Cache"** (optional)
-- Click **"Redeploy"**
+- Click **•••** on latest deployment
+- Click **Redeploy**
 
-### Using Vercel CLI:
+**Via CLI:**
 ```bash
 vercel --prod
 ```
 
----
+### 7. Test Your Deployment
 
-## Step 7: Verify Deployment
+Visit `https://your-project-name.vercel.app` and test:
 
-1. **Visit your production URL**: `https://babyleo.vercel.app`
-2. **Test the pages**:
-   - Homepage with countdown: `/`
-   - Prediction form: `/predict`
-   - All predictions: `/predictions`
-   - Admin dashboard: `/admin`
-   - Results page: `/fake-end-results`
-
-3. **Test QR Code Feature**:
-   - Go to `/admin`
-   - Click "Show QR Code"
-   - Verify it shows `babyleo.vercel.app`
-
-4. **Check environment variables are working**:
-   - No database connection errors
-   - Admin email login works
-   - QR code displays correct URL
-
----
-
-## Project Structure for Vercel
-
-```
-leonardo/
-├── app/                    # Next.js App Router
-├── components/             # React components
-├── lib/                    # Utilities and constants
-├── prisma/                 # Database schema
-│   └── schema.prisma
-├── public/                 # Static assets
-├── messages/               # i18n translations
-├── .env.local             # Local environment variables (gitignored)
-├── .env.example           # Example env vars (optional)
-├── package.json
-├── tsconfig.json
-├── tailwind.config.ts
-├── next.config.ts
-└── vercel.json            # Vercel configuration (optional)
-```
-
----
+- ✅ Homepage with countdown
+- ✅ Multi-language support (EN, ES-AR, SV)
+- ✅ `/predict` - Prediction form
+- ✅ `/predictions` - View all predictions
+- ✅ `/admin` - Admin dashboard (use your admin email)
 
 ## Environment Variables Reference
 
-Create a `.env.example` file for reference:
+Complete list of environment variables:
 
 ```env
-# Database (provided by Vercel Postgres)
+# Database (auto-added by Vercel Postgres)
 DATABASE_URL="postgresql://..."
 POSTGRES_PRISMA_URL="postgresql://..."
+POSTGRES_URL="postgresql://..."
+POSTGRES_URL_NON_POOLING="postgresql://..."
 
-# NextAuth.js
+# Authentication
 NEXTAUTH_URL="https://your-app.vercel.app"
-NEXTAUTH_SECRET="your-generated-secret"
+NEXTAUTH_SECRET="your-generated-secret-key"
+
+# Public URLs (must start with NEXT_PUBLIC_)
+NEXT_PUBLIC_SITE_URL="https://your-app.vercel.app"
 
 # Admin
-ADMIN_EMAIL="lllencinas@gmail.com"
+ADMIN_EMAIL="your-admin-email@example.com"
 
-# QR Code
-NEXT_PUBLIC_SITE_URL="https://babyleo.vercel.app"
-
-# Google OAuth (optional)
-GOOGLE_CLIENT_ID="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
+# Optional: Google OAuth (for future use)
+# GOOGLE_CLIENT_ID="..."
+# GOOGLE_CLIENT_SECRET="..."
 ```
 
----
-
-## Troubleshooting
+## Common Issues
 
 ### Build Fails
 
-**Check build logs** in Vercel dashboard:
-- Go to **Deployments** → Click on failed deployment → **View Build Logs**
+**Check build logs:**
+- Vercel Dashboard → Deployments → [Failed deployment] → View Logs
 
-Common issues:
-- TypeScript errors: Fix type issues locally first
-- Missing dependencies: Ensure all packages are in `package.json`
-- Environment variables: Check they're set correctly
+**Common causes:**
+- TypeScript errors (fix locally with `npm run build`)
+- Missing dependencies (check `package.json`)
+- Environment variables not set
 
-### Database Connection Issues
+### Database Connection Errors
 
-1. Verify environment variables are set in Vercel
-2. Check Prisma schema is pushed: `npx prisma db push`
-3. Verify `DATABASE_URL` or `POSTGRES_PRISMA_URL` is correct
+**Solutions:**
+1. Verify database is created in Vercel Storage tab
+2. Check environment variables are set correctly
+3. Confirm Prisma schema was pushed: `npx prisma db push`
+4. Check `DATABASE_URL` format is correct
 
-### NextAuth Errors
+### "NEXTAUTH_SECRET is not set"
 
-1. Ensure `NEXTAUTH_SECRET` is set
-2. Ensure `NEXTAUTH_URL` matches your production URL
-3. Check that Prisma schema includes NextAuth models (User, Session, Account)
+**Solution:**
+1. Add `NEXTAUTH_SECRET` in Vercel Settings → Environment Variables
+2. Redeploy the app
 
----
+### Admin Panel Shows "Not Authorized"
 
-## Next Steps After Deployment
+**Solution:**
+1. Verify `ADMIN_EMAIL` matches the email you're using
+2. Check browser console for errors
+3. Try clearing localStorage and re-entering email
 
-1. **Set up authentication** (NextAuth.js configuration)
-2. **Connect prediction form** to database
-3. **Build admin panel** for entering results
-4. **Configure custom domain** (optional)
-5. **Set up monitoring** (Vercel Analytics)
+## Continuous Deployment
 
----
+Vercel automatically deploys when you push to GitHub:
+
+```bash
+git add .
+git commit -m "Update feature"
+git push
+
+# Vercel will auto-deploy to production
+```
+
+**Preview Deployments:**
+- Every push to non-main branches creates a preview deployment
+- Preview URL: `https://leonardo-<hash>.vercel.app`
+
+## Custom Domain (Optional)
+
+1. Go to **Settings** → **Domains**
+2. Add your custom domain
+3. Follow DNS configuration instructions
+4. Update `NEXTAUTH_URL` and `NEXT_PUBLIC_SITE_URL` to use new domain
 
 ## Useful Commands
 
 ```bash
-# View deployment logs
-vercel logs <deployment-url>
+# Vercel CLI commands
+vercel                      # Deploy to preview
+vercel --prod              # Deploy to production
+vercel env pull            # Download environment variables
+vercel env ls              # List environment variables
+vercel logs                # View deployment logs
+vercel domains             # Manage domains
 
-# List environment variables
-vercel env ls
-
-# Pull environment variables to local
-vercel env pull .env.local
-
-# Open Prisma Studio (connected to production DB)
-npx prisma studio
-
-# Check database migrations
-npx prisma migrate status
-
-# Deploy to production
-vercel --prod
-
-# Deploy to preview
-vercel
+# Database commands
+npx prisma studio          # Open database viewer
+npx prisma db push         # Push schema changes
+npx prisma generate        # Regenerate Prisma client
+npx prisma migrate dev     # Create migration (dev only)
 ```
 
+## Production Checklist
+
+Before sharing your app:
+
+- [ ] All environment variables are set
+- [ ] Database schema is pushed
+- [ ] Admin email is configured
+- [ ] Test all pages load correctly
+- [ ] Test prediction form submission
+- [ ] Test admin panel access
+- [ ] Verify all 3 languages work
+- [ ] Check mobile responsiveness
+- [ ] Test on different browsers
+- [ ] Verify analytics are working (Vercel Analytics tab)
+
+## Monitoring
+
+**Vercel Analytics:**
+- Go to **Analytics** tab in dashboard
+- View page views, unique visitors, and more
+
+**Vercel Logs:**
+- Go to **Deployments** → Click deployment → **Functions**
+- View real-time function logs
+
+**Database Usage:**
+- Go to **Storage** tab → Click your database
+- Monitor storage and compute usage
+
+## Cost
+
+**Free Tier Includes:**
+- Vercel Hosting: Unlimited deployments
+- Postgres Database: 256MB storage, 60 hours compute/month
+- Analytics: Basic metrics
+- SSL Certificates: Automatic
+
+**Estimated Cost:** $0/month (free tier is sufficient for this project)
+
+## Backup Strategy
+
+**Database Backups:**
+
+```bash
+# Export data via Prisma
+npx prisma db pull          # Pull schema
+npx prisma db seed          # Run seed file (if configured)
+
+# Or use pg_dump (if you have database credentials)
+pg_dump $DATABASE_URL > backup.sql
+```
+
+**Vercel Postgres** automatically creates backups, but you can also:
+1. Export via Prisma Studio
+2. Use Vercel's database snapshots (paid feature)
+
+## Rollback
+
+If deployment fails:
+
+**Via Dashboard:**
+1. Go to **Deployments**
+2. Find last working deployment
+3. Click **•••** → **Promote to Production**
+
+**Via CLI:**
+```bash
+vercel rollback
+```
+
+## Support Resources
+
+- [Vercel Documentation](https://vercel.com/docs)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [next-intl Documentation](https://next-intl-docs.vercel.app/)
+
+## Troubleshooting Contact
+
+For issues specific to this project, check:
+1. Vercel deployment logs
+2. Browser console errors
+3. API route responses in Network tab
+4. Prisma schema matches database structure
+
 ---
 
-## Cost Estimate (Free Tier)
-
-- **Vercel Hosting**: Free (Hobby plan)
-  - Unlimited deployments
-  - 100GB bandwidth/month
-  - Automatic HTTPS
-
-- **Vercel Postgres**: Free tier includes:
-  - 256 MB storage
-  - 60 hours compute/month
-  - Good for hobby projects and MVPs
-
-**Total monthly cost**: $0 🎉
-
----
-
-## Support
-
-For issues:
-- Vercel Docs: https://vercel.com/docs
-- Next.js Docs: https://nextjs.org/docs
-- Prisma Docs: https://www.prisma.io/docs
+**Last Updated:** 2025-01-18
+**Current Production URL:** https://your-project.vercel.app

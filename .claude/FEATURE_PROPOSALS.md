@@ -80,130 +80,83 @@ FROM_EMAIL=noreply@yourdomain.com
 
 ---
 
-## 2. Edit Predictions 📝
+## 2. ✅ Edit Predictions - COMPLETE! 📝
 
-### Purpose
-Allow users to modify their predictions before the deadline.
+### Status: FULLY IMPLEMENTED
 
-### Rules
-- Can edit anytime **before** submissions lock (Jan 5, 2026)
-- After lock date: NO edits allowed
-- Must use same email to edit
+Users can now modify their predictions before the deadline!
 
-### Implementation
+### Features Implemented
 
-#### A. Database Changes
-Already supported! Just need to:
-- Check if prediction exists for email
-- Update instead of create
+✅ **Auto-load existing predictions**
+- Form checks localStorage for user's email
+- Fetches prediction via `/api/predictions/by-email`
+- Pre-fills all form fields automatically
 
-#### B. API Changes
-**Update `POST /api/predictions`**
-```typescript
-// Check if prediction exists for this email
-const existing = await prisma.prediction.findFirst({
-  where: { user: { email: formData.userEmail } }
-});
+✅ **Smart Update/Create Logic**
+- API automatically detects existing predictions
+- Updates existing record instead of creating duplicates
+- Maintains data integrity
 
-if (existing) {
-  // UPDATE existing prediction
-  await prisma.prediction.update({
-    where: { id: existing.id },
-    data: { ...newData }
-  });
-} else {
-  // CREATE new prediction
-  await prisma.prediction.create({...});
-}
-```
+✅ **Edit Mode UI**
+- Blue banner: "✏️ You're Editing Your Prediction"
+- Dynamic button text: "Update My Prediction" vs "Submit Prediction"
+- Different success messages for updates vs new submissions
 
-#### C. UI Changes
-**Prediction Form (`/predict`)**
-- On load, check if user has existing prediction
-- If yes, pre-fill form with their data
-- Change button text: "Update My Prediction" vs "Submit Prediction"
-- Show message: "You're editing your prediction"
+✅ **Submission Lock Respect**
+- Edits blocked when admin locks submissions
+- Shows clear "Submissions Are Closed" message
 
-#### D. UX Flow
-```
-User visits /predict
-  ↓
-Checks localStorage for email
-  ↓
-Fetches their existing prediction
-  ↓
-Pre-fills form
-  ↓
-Shows: "✏️ Editing Your Prediction"
-  ↓
-User modifies and submits
-  ↓
-Updates database (not creates new)
-```
+### How to Test
 
-### Estimated Time
-- API changes: 30 minutes
-- UI pre-fill logic: 1 hour
-- Testing: 30 minutes
+See [.claude/EDIT_PREDICTION_TEST.md](.claude/EDIT_PREDICTION_TEST.md) for complete testing guide.
 
-**Total: ~2 hours**
+### Code References
+
+- Form: [app/[locale]/(app)/predict/page.tsx](app/[locale]/(app)/predict/page.tsx:71-110)
+- API: [app/api/predictions/route.ts](app/api/predictions/route.ts:41-87)
+- Fetch: [app/api/predictions/by-email/route.ts](app/api/predictions/by-email/route.ts)
 
 ---
 
-## 3. Missing Translations 🌍
+## Status Summary
 
-### Current Situation
-- Translations exist for: home, predict, predictions, results, admin
-- Many hardcoded strings in newly added features:
-  - Admin dashboard cards
-  - Clear all data
-  - Prediction gate
-  - Review summary sections
-  - Error messages
+✅ **Translations** - COMPLETE! All pages fully translated (EN, ES-AR, SV)
+✅ **Edit Predictions** - COMPLETE! Users can modify predictions before deadline
 
-### Pages Needing Translation Audit
-1. ✅ Home page - has translations
-2. ⚠️ Predict page - partial (new features need i18n)
-3. ⚠️ Predictions page - partial (gate needs i18n)
-4. ⚠️ Admin pages - minimal translations
-5. ❌ Clear data modal - NO translations
-6. ❌ Lock submissions UI - NO translations
+## Remaining Features
 
-### Implementation Strategy
-1. **Audit**: Find all hardcoded strings
-2. **Add keys**: Update messages/en.json, sv.json, es-AR.json
-3. **Replace**: Change hardcoded strings to `t('key')`
-4. **Test**: Check all 3 languages
+### Email Verification (~3 hours)
+**Status**: Proposed, not yet implemented
 
-### Estimated Time
-- Audit: 30 minutes
-- Add translations: 1 hour
-- Replace strings: 1-2 hours
-- Test: 30 minutes
+**Purpose**: Cross-device access to predictions
 
-**Total: ~3-4 hours**
+**Current Limitation**:
+- Users can only edit predictions on the same browser (localStorage dependency)
+- Switching devices or browsers means they can't access their prediction
+
+**Proposed Solution**:
+- Email verification with 6-digit code
+- Users can access predictions from any device
+- More secure than localStorage only
+
+**Priority**: Nice-to-have, not critical
+- Current localStorage approach works well for single-device users
+- Consider implementing if cross-device access becomes important
+
+See "Email Verification Flow" section above for implementation details.
 
 ---
 
-## Priority Recommendation
+## Next Steps
 
-### Quick Wins (Do These First)
-1. **Edit Predictions** - 2 hours, high user value
-2. **Translations** - 3-4 hours, professional polish
+**Recommended priorities:**
 
-### Can Wait
-3. **Email Verification** - 3 hours, nice-to-have
-   - Current localStorage approach works fine
-   - Only needed if cross-device is essential
+1. **Test Edit Predictions** - Verify the feature works as expected
+2. **Polish & Bug Fixes** - Address any issues found during testing
+3. **Email Verification** (Optional) - If cross-device access is needed
+4. **Bonding Features** (from SESSION_SUMMARY.md):
+   - Google Photos integration
+   - Email notifications
 
----
-
-## Decision Time!
-
-**Which features do you want me to implement?**
-
-A. All three?
-B. Edit predictions + Translations (skip email verification)?
-C. Just one specific feature?
-
-Let me know and I'll implement them in order! 🚀
+**Ready to implement any of these? Let me know!** 🚀

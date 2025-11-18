@@ -318,5 +318,21 @@
     "blonde": "Blond",
     "black": "Svart",
     "red": "Röd"
+  },
+  "VerifyEmail": {
+    "verifying": "Verifierar din e-post...",
+    "pleaseWait": "Vänta medan vi verifierar din e-postadress",
+    "success": "E-post Verifierad!",
+    "successMessage": "Din e-post har verifierats framgångsrikt.",
+    "redirecting": "Omdirigerar dig för att göra din förutsägelse...",
+    "error": "Verifiering Misslyckades",
+    "verificationFailed": "Kunde inte verifiera din e-post. Länken kan ha upphört.",
+    "unexpectedError": "Ett oväntat fel uppstod under verifieringen.",
+    "missingParams": "Ogiltig verifieringslänk. Vänligen kontrollera din e-post och försök igen.",
+    "emailResent": "Ett nytt verifieringsmail har skickats till din inkorg.",
+    "resendFailed": "Kunde inte skicka verifieringsmail igen. Vänligen försök igen.",
+    "resendEmail": "Skicka Verifieringsmail Igen",
+    "resending": "Skickar igen...",
+    "backHome": "Tillbaka till Hem"
   }
 }

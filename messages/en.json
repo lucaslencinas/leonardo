@@ -319,5 +319,21 @@
     "blonde": "Blonde",
     "black": "Black",
     "red": "Red"
+  },
+  "VerifyEmail": {
+    "verifying": "Verifying your email...",
+    "pleaseWait": "Please wait while we verify your email address",
+    "success": "Email Verified!",
+    "successMessage": "Your email has been successfully verified.",
+    "redirecting": "Redirecting you to make your prediction...",
+    "error": "Verification Failed",
+    "verificationFailed": "Failed to verify your email. The link may have expired.",
+    "unexpectedError": "An unexpected error occurred during verification.",
+    "missingParams": "Invalid verification link. Please check your email and try again.",
+    "emailResent": "A new verification email has been sent to your inbox.",
+    "resendFailed": "Failed to resend verification email. Please try again.",
+    "resendEmail": "Resend Verification Email",
+    "resending": "Resending...",
+    "backHome": "Back to Home"
   }
 }

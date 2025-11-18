@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { DateSlider } from '@/components/forms/DateSlider';
 import { TimeSlider } from '@/components/forms/TimeSlider';
@@ -25,6 +25,7 @@ interface FormData {
 export default function PredictPage() {
   const t = useTranslations('predict');
   const tCommon = useTranslations('common');
+  const locale = useLocale();
 
   // Due date: February 5, 2026 at 12:00 PM
   const dueDate = new Date('2026-02-05T12:00:00');
@@ -46,6 +47,7 @@ export default function PredictPage() {
   const [submitStatus, setSubmitStatus] = useState<{
     type: 'success' | 'error' | null;
     message: string;
+    verificationEmailSent?: boolean;
   }>({ type: null, message: '' });
   const [submissionsLocked, setSubmissionsLocked] = useState(false);
   const [isCheckingLock, setIsCheckingLock] = useState(true);
@@ -144,7 +146,7 @@ export default function PredictPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, locale }),
       });
 
       const data = await response.json();
@@ -159,6 +161,7 @@ export default function PredictPage() {
       setSubmitStatus({
         type: 'success',
         message: data.message || t('successMessage'),
+        verificationEmailSent: data.verificationEmailSent || false,
       });
 
       // Scroll to top to show success message
@@ -395,12 +398,22 @@ export default function PredictPage() {
                   <h2 className="text-3xl font-heading font-bold text-neutral-dark mb-4">
                     {isEditMode ? t('predictionUpdatedTitle') : t('predictionSubmittedTitle')}
                   </h2>
-                  <p className="text-lg text-neutral-medium mb-8">
+                  <p className="text-lg text-neutral-medium mb-6">
                     {isEditMode
                       ? t('predictionUpdatedMessage')
                       : t('predictionSubmittedMessage')
                     }
                   </p>
+                  {submitStatus.verificationEmailSent && (
+                    <div className="bg-baby-mint/20 border-2 border-baby-mint rounded-2xl p-6 mb-8 max-w-lg mx-auto">
+                      <div className="text-4xl mb-3">📧</div>
+                      <h3 className="text-xl font-bold text-neutral-dark mb-2">Check Your Email!</h3>
+                      <p className="text-neutral-medium">
+                        We&apos;ve sent a verification email to <strong>{formData.userEmail}</strong>.
+                        Click the link in the email to verify your address and enable cross-device access to your prediction.
+                      </p>
+                    </div>
+                  )}
                   <Link
                     href="/predictions"
                     className="inline-block px-8 py-4 bg-baby-blue text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"

@@ -318,5 +318,21 @@
     "blonde": "Rubio",
     "black": "Negro",
     "red": "Pelirrojo"
+  },
+  "VerifyEmail": {
+    "verifying": "Verificando tu email...",
+    "pleaseWait": "Por favor espera mientras verificamos tu dirección de email",
+    "success": "¡Email Verificado!",
+    "successMessage": "Tu email ha sido verificado exitosamente.",
+    "redirecting": "Redirigiendo para hacer tu predicción...",
+    "error": "Verificación Fallida",
+    "verificationFailed": "No se pudo verificar tu email. El enlace puede haber expirado.",
+    "unexpectedError": "Ocurrió un error inesperado durante la verificación.",
+    "missingParams": "Enlace de verificación inválido. Por favor revisa tu email e intenta de nuevo.",
+    "emailResent": "Se ha enviado un nuevo email de verificación a tu bandeja de entrada.",
+    "resendFailed": "No se pudo reenviar el email de verificación. Por favor intenta de nuevo.",
+    "resendEmail": "Reenviar Email de Verificación",
+    "resending": "Reenviando...",
+    "backHome": "Volver al Inicio"
   }
 }
