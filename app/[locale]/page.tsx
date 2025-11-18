@@ -16,7 +16,7 @@ export default function HomePage() {
         const data = await response.json();
         if (response.ok && data.predictions) {
           // Count unique participants
-          const uniqueParticipants = new Set(data.predictions.map((p: any) => p.userEmail));
+          const uniqueParticipants = new Set(data.predictions.map((p: any) => p.user.email));
           setParticipantCount(uniqueParticipants.size);
         }
       } catch (err) {

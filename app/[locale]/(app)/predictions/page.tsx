@@ -38,8 +38,9 @@ export default function PredictionsPage() {
   const dueDate = new Date('2026-02-05T12:00:00');
 
   useEffect(() => {
-    // Check if user has submitted a prediction
+    // Check if user has submitted a prediction or is an admin
     const submittedEmail = localStorage.getItem('predictionSubmitted');
+    const adminEmail = localStorage.getItem('adminEmail');
 
     async function fetchPredictions() {
       try {
@@ -52,8 +53,12 @@ export default function PredictionsPage() {
 
         const allPredictions = data.predictions || [];
 
+        // Admins can always view predictions
+        if (adminEmail) {
+          setHasSubmitted(true);
+        }
         // Check if this user has submitted a prediction
-        if (submittedEmail) {
+        else if (submittedEmail) {
           const userPrediction = allPredictions.find(
             (p: Prediction) => {
               const email = p.userEmail || p.user?.email;
