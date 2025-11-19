@@ -20,6 +20,7 @@ interface Prediction {
   height: number;
   eyeColor: string;
   hairColor: string;
+  connectionTypes: string[];
   submittedAt: string;
   user?: {
     name: string;
@@ -34,6 +35,7 @@ export default function PredictionsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [connectionFilter, setConnectionFilter] = useState<'all' | 'family' | 'friends'>('all');
 
   const dueDate = new Date('2026-02-05T12:00:00');
 
@@ -80,8 +82,14 @@ export default function PredictionsPage() {
     fetchPredictions();
   }, []);
 
+  // Filter predictions based on connection type
+  const filteredPredictions = predictions.filter((p) => {
+    if (connectionFilter === 'all') return true;
+    return p.connectionTypes.includes(connectionFilter);
+  });
+
   // Convert API predictions to the format expected by result components
-  const formattedPredictions = predictions.map((p) => {
+  const formattedPredictions = filteredPredictions.map((p) => {
     const [hours, minutes] = p.birthTime.split(':').map(Number);
     return {
       id: p.id,
@@ -215,6 +223,48 @@ export default function PredictionsPage() {
               {t('predictionsSubmitted', { count: predictions.length })}
             </span>
           </div>
+        </div>
+
+        {/* Connection Type Filter */}
+        <div className="flex flex-col items-center gap-4">
+          <h3 className="text-lg font-semibold text-neutral-dark">{t('filterByConnection')}</h3>
+          <div className="flex gap-3 flex-wrap justify-center">
+            <button
+              onClick={() => setConnectionFilter('all')}
+              className={`px-6 py-3 font-semibold rounded-2xl transition-all duration-200 ${
+                connectionFilter === 'all'
+                  ? 'bg-baby-blue text-white shadow-lg'
+                  : 'bg-white border-2 border-neutral-light text-neutral-dark hover:border-baby-blue'
+              }`}
+            >
+              {t('allPredictions')} ({predictions.length})
+            </button>
+            <button
+              onClick={() => setConnectionFilter('family')}
+              className={`px-6 py-3 font-semibold rounded-2xl transition-all duration-200 ${
+                connectionFilter === 'family'
+                  ? 'bg-baby-blue text-white shadow-lg'
+                  : 'bg-white border-2 border-neutral-light text-neutral-dark hover:border-baby-blue'
+              }`}
+            >
+              {t('familyOnly')} ({predictions.filter(p => p.connectionTypes.includes('family')).length})
+            </button>
+            <button
+              onClick={() => setConnectionFilter('friends')}
+              className={`px-6 py-3 font-semibold rounded-2xl transition-all duration-200 ${
+                connectionFilter === 'friends'
+                  ? 'bg-baby-blue text-white shadow-lg'
+                  : 'bg-white border-2 border-neutral-light text-neutral-dark hover:border-baby-blue'
+              }`}
+            >
+              {t('friendsOnly')} ({predictions.filter(p => p.connectionTypes.includes('friends')).length})
+            </button>
+          </div>
+          {formattedPredictions.length === 0 && connectionFilter !== 'all' && (
+            <p className="text-neutral-medium text-sm mt-2">
+              {t('noMatchingPredictions')}
+            </p>
+          )}
         </div>
 
         {/* Call to action */}
