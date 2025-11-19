@@ -8,6 +8,7 @@ const hairColorIds = HAIR_COLORS.map(c => c.id) as [string, ...string[]];
 export const predictionSchema = z.object({
   userName: z.string().min(2, 'Name must be at least 2 characters').max(50, 'Name must be less than 50 characters'),
   userEmail: z.string().email('Invalid email address'),
+  connectionTypes: z.array(z.enum(['family', 'friends'])).min(1, 'Please select at least one connection type'),
   birthDate: z.coerce.date(),
   birthTime: z.object({
     hours: z.number().min(0).max(23),
