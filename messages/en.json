@@ -119,7 +119,13 @@
     "successMessage": "Prediction submitted successfully!",
     "unexpectedError": "An unexpected error occurred",
     "userInfoTitle": "👤 Tell us about yourself",
-    "userInfoSubtitle": "We'll use this to identify your prediction"
+    "userInfoSubtitle": "We'll use this to identify your prediction",
+    "connectionType": "Connection Type",
+    "family": "Family",
+    "friends": "Friends",
+    "familyDescription": "I'm a family member",
+    "friendsDescription": "I'm a friend",
+    "connectionTypeNote": "Select at least one option. You can select both if applicable."
   },
   "predictions": {
     "title": "Family Predictions",
@@ -147,7 +153,12 @@
     "somethingWentWrong": "Oops! Something went wrong",
     "goHome": "Go Home",
     "backToHomeLink": "← Back to Home",
-    "addYourPrediction": "Add Your Prediction 🎉"
+    "addYourPrediction": "Add Your Prediction 🎉",
+    "filterByConnection": "Filter by Connection Type",
+    "allPredictions": "All",
+    "familyOnly": "Family",
+    "friendsOnly": "Friends",
+    "noMatchingPredictions": "No predictions match this filter"
   },
   "results": {
     "title": "The Results Are In!",

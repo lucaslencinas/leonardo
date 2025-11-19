@@ -119,7 +119,13 @@
     "successMessage": "¡Predicción enviada exitosamente!",
     "unexpectedError": "Ocurrió un error inesperado",
     "userInfoTitle": "👤 Contanos sobre vos",
-    "userInfoSubtitle": "Usaremos esto para identificar tu predicción"
+    "userInfoSubtitle": "Usaremos esto para identificar tu predicción",
+    "connectionType": "Tipo de Conexión",
+    "family": "Familia",
+    "friends": "Amigos",
+    "familyDescription": "Soy un familiar",
+    "friendsDescription": "Soy un amigo",
+    "connectionTypeNote": "Seleccioná al menos una opción. Podés seleccionar ambas si aplica."
   },
   "predictions": {
     "title": "Predicciones de la Familia",
@@ -147,7 +153,12 @@
     "somethingWentWrong": "¡Ups! Algo salió mal",
     "goHome": "Ir al Inicio",
     "backToHomeLink": "← Volver al Inicio",
-    "addYourPrediction": "Agregá Tu Predicción 🎉"
+    "addYourPrediction": "Agregá Tu Predicción 🎉",
+    "filterByConnection": "Filtrar por Tipo de Conexión",
+    "allPredictions": "Todas",
+    "familyOnly": "Familia",
+    "friendsOnly": "Amigos",
+    "noMatchingPredictions": "No hay predicciones que coincidan con este filtro"
   },
   "results": {
     "title": "¡Llegaron los Resultados!",

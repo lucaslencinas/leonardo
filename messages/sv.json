@@ -119,7 +119,13 @@
     "successMessage": "Förutsägelse skickad framgångsrikt!",
     "unexpectedError": "Ett oväntat fel inträffade",
     "userInfoTitle": "👤 Berätta om dig själv",
-    "userInfoSubtitle": "Vi använder detta för att identifiera din förutsägelse"
+    "userInfoSubtitle": "Vi använder detta för att identifiera din förutsägelse",
+    "connectionType": "Anslutningstyp",
+    "family": "Familj",
+    "friends": "Vänner",
+    "familyDescription": "Jag är en familjemedlem",
+    "friendsDescription": "Jag är en vän",
+    "connectionTypeNote": "Välj minst ett alternativ. Du kan välja båda om tillämpligt."
   },
   "predictions": {
     "title": "Familjens Förutsägelser",
@@ -147,7 +153,12 @@
     "somethingWentWrong": "Hoppsan! Något gick fel",
     "goHome": "Gå Till Hem",
     "backToHomeLink": "← Tillbaka Till Hem",
-    "addYourPrediction": "Lägg Till Din Förutsägelse 🎉"
+    "addYourPrediction": "Lägg Till Din Förutsägelse 🎉",
+    "filterByConnection": "Filtrera efter Anslutningstyp",
+    "allPredictions": "Alla",
+    "familyOnly": "Familj",
+    "friendsOnly": "Vänner",
+    "noMatchingPredictions": "Inga förutsägelser matchar detta filter"
   },
   "results": {
     "title": "Resultaten Är Här!",
