@@ -14,6 +14,7 @@ import { EYE_COLORS, HAIR_COLORS, type EyeColorId, type HairColorId } from '@/li
 interface FormData {
   userName: string;
   userEmail: string;
+  connectionTypes: ('family' | 'friends')[];
   birthDate: Date;
   birthTime: { hours: number; minutes: number };
   weight: number;
@@ -34,6 +35,7 @@ export default function PredictPage() {
   const [formData, setFormData] = useState<FormData>({
     userName: '',
     userEmail: '',
+    connectionTypes: [],
     birthDate: dueDate,
     birthTime: { hours: 12, minutes: 0 },
     weight: 3.5, // kg
@@ -89,6 +91,7 @@ export default function PredictPage() {
             setFormData({
               userName: pred.userName || '',
               userEmail: pred.userEmail || '',
+              connectionTypes: pred.connectionTypes || [],
               birthDate: new Date(pred.birthDate),
               birthTime: { hours, minutes },
               weight: pred.weight,
@@ -242,7 +245,7 @@ export default function PredictPage() {
             <div className="flex justify-between mb-2">
               {steps.map((step, index) => {
                 // Only allow clicking on completed steps (with validation)
-                const canNavigate = index < currentStep && formData.userName && formData.userEmail;
+                const canNavigate = index < currentStep && formData.userName && formData.userEmail && formData.connectionTypes.length > 0;
 
                 return (
                 <div
@@ -328,6 +331,54 @@ export default function PredictPage() {
                 />
                 <p className="mt-2 text-xs text-neutral-medium">
                   {t('emailNote')}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-neutral-dark mb-3">
+                  {t('connectionType')}
+                </label>
+                <div className="space-y-3">
+                  <label className="flex items-center gap-3 p-4 border-2 border-neutral-light rounded-lg cursor-pointer hover:border-baby-blue transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={formData.connectionTypes.includes('family')}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({ ...formData, connectionTypes: [...formData.connectionTypes, 'family'] });
+                        } else {
+                          setFormData({ ...formData, connectionTypes: formData.connectionTypes.filter(t => t !== 'family') });
+                        }
+                      }}
+                      className="w-5 h-5 text-baby-blue border-2 border-neutral-light rounded focus:ring-2 focus:ring-baby-blue"
+                    />
+                    <div>
+                      <div className="font-semibold text-neutral-dark">{t('family')}</div>
+                      <div className="text-xs text-neutral-medium">{t('familyDescription')}</div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center gap-3 p-4 border-2 border-neutral-light rounded-lg cursor-pointer hover:border-baby-blue transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={formData.connectionTypes.includes('friends')}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({ ...formData, connectionTypes: [...formData.connectionTypes, 'friends'] });
+                        } else {
+                          setFormData({ ...formData, connectionTypes: formData.connectionTypes.filter(t => t !== 'friends') });
+                        }
+                      }}
+                      className="w-5 h-5 text-baby-blue border-2 border-neutral-light rounded focus:ring-2 focus:ring-baby-blue"
+                    />
+                    <div>
+                      <div className="font-semibold text-neutral-dark">{t('friends')}</div>
+                      <div className="text-xs text-neutral-medium">{t('friendsDescription')}</div>
+                    </div>
+                  </label>
+                </div>
+                <p className="mt-2 text-xs text-neutral-medium">
+                  {t('connectionTypeNote')}
                 </p>
               </div>
             </div>
@@ -453,6 +504,19 @@ export default function PredictPage() {
                         <div className="text-base font-bold text-neutral-dark truncate">{formData.userEmail}</div>
                       </div>
                     </div>
+                    <div className="mt-3 pt-3 border-t border-neutral-light">
+                      <span className="text-xs text-neutral-medium">{t('connectionType')}</span>
+                      <div className="flex gap-2 mt-1">
+                        {formData.connectionTypes.map((type) => (
+                          <span
+                            key={type}
+                            className="inline-block px-3 py-1 bg-baby-blue/10 text-baby-blue text-sm font-semibold rounded-full"
+                          >
+                            {type === 'family' ? t('family') : t('friends')}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Birth Details Section */}
@@ -537,9 +601,9 @@ export default function PredictPage() {
           {currentStep < steps.length - 1 ? (
             <button
               onClick={handleNext}
-              disabled={currentStep === 0 && (!formData.userName || !formData.userEmail)}
+              disabled={currentStep === 0 && (!formData.userName || !formData.userEmail || formData.connectionTypes.length === 0)}
               className={`w-full sm:w-auto px-6 py-3 font-semibold rounded-2xl shadow-md transition-all duration-200 ${
-                currentStep === 0 && (!formData.userName || !formData.userEmail)
+                currentStep === 0 && (!formData.userName || !formData.userEmail || formData.connectionTypes.length === 0)
                   ? 'bg-neutral-light text-neutral-medium cursor-not-allowed'
                   : 'bg-baby-blue text-white hover:shadow-lg hover:scale-105'
               }`}
