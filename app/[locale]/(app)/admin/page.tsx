@@ -11,6 +11,22 @@ interface AdminUser {
   name: string | null;
 }
 
+interface Prediction {
+  id: string;
+  birthDate: string;
+  birthTime: string;
+  weight: number;
+  height: number;
+  eyeColor: string;
+  hairColor: string;
+  connectionTypes: string[];
+  submittedAt: string;
+  user: {
+    name: string;
+    email: string;
+  };
+}
+
 export default function AdminPage() {
   const t = useTranslations('admin');
   const router = useRouter();
@@ -23,10 +39,15 @@ export default function AdminPage() {
     totalPredictions: number;
     predictors: Array<{ name: string; email: string }>;
   } | null>(null);
+  const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [submissionsLocked, setSubmissionsLocked] = useState(false);
   const [isTogglingLock, setIsTogglingLock] = useState(false);
   const [isClearingData, setIsClearingData] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [editingPrediction, setEditingPrediction] = useState<Prediction | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Check if already authenticated (from localStorage)
   useEffect(() => {
@@ -93,6 +114,7 @@ export default function AdminPage() {
 
       if (response.ok) {
         const predictions = data.predictions || [];
+        setPredictions(predictions);
         setStats({
           totalPredictions: predictions.length,
           predictors: predictions.map((p: any) => ({
@@ -169,6 +191,82 @@ export default function AdminPage() {
       alert(t('errorWhileClearing'));
     } finally {
       setIsClearingData(false);
+    }
+  };
+
+  const handleEditPrediction = (prediction: Prediction) => {
+    setEditingPrediction(prediction);
+    setShowEditModal(true);
+  };
+
+  const handleSavePrediction = async () => {
+    if (!editingPrediction) return;
+
+    setIsSaving(true);
+    try {
+      const adminEmail = localStorage.getItem('adminEmail');
+      const response = await fetch(`/api/admin/predictions/${editingPrediction.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          adminEmail,
+          updates: {
+            birthDate: editingPrediction.birthDate,
+            birthTime: editingPrediction.birthTime,
+            weight: editingPrediction.weight,
+            height: editingPrediction.height,
+            eyeColor: editingPrediction.eyeColor,
+            hairColor: editingPrediction.hairColor,
+            connectionTypes: editingPrediction.connectionTypes,
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        await fetchStats();
+        setShowEditModal(false);
+        setEditingPrediction(null);
+        alert('Prediction updated successfully!');
+      } else {
+        alert('Failed to update prediction: ' + data.error);
+      }
+    } catch (err) {
+      console.error('Failed to update prediction:', err);
+      alert('Error while updating prediction');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeletePrediction = async (predictionId: string) => {
+    if (!confirm('Are you sure you want to delete this prediction? This will also delete the user and all related data. This action cannot be undone.')) {
+      return;
+    }
+
+    setDeletingId(predictionId);
+    try {
+      const adminEmail = localStorage.getItem('adminEmail');
+      const response = await fetch(`/api/admin/predictions/${predictionId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminEmail }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        await fetchStats();
+        alert('Prediction and all related data deleted successfully!');
+      } else {
+        alert('Failed to delete prediction: ' + data.error);
+      }
+    } catch (err) {
+      console.error('Failed to delete prediction:', err);
+      alert('Error while deleting prediction');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -433,10 +531,10 @@ export default function AdminPage() {
         </div>
 
         {/* Participants List */}
-        {stats && stats.predictors.length > 0 && (
+        {predictions && predictions.length > 0 && (
           <div className="bg-white rounded-3xl shadow-lg p-6 border-2 border-baby-blue/20">
             <h2 className="text-2xl font-heading font-bold text-neutral-dark mb-4">
-              {t('participantsListTitle', { count: stats.predictors.length })}
+              {t('participantsListTitle', { count: predictions.length })}
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -448,24 +546,220 @@ export default function AdminPage() {
                     <th className="text-left py-3 px-4 text-neutral-medium font-semibold">
                       {t('emailColumn')}
                     </th>
+                    <th className="text-right py-3 px-4 text-neutral-medium font-semibold">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {stats.predictors.map((predictor, index) => (
+                  {predictions.map((prediction) => (
                     <tr
-                      key={index}
+                      key={prediction.id}
                       className="border-b border-neutral-light hover:bg-baby-cream/20 transition-colors"
                     >
                       <td className="py-3 px-4 font-semibold text-neutral-dark">
-                        {predictor.name}
+                        {prediction.user.name}
                       </td>
                       <td className="py-3 px-4 text-neutral-medium">
-                        {predictor.email}
+                        {prediction.user.email}
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            onClick={() => handleEditPrediction(prediction)}
+                            className="px-3 py-1 bg-baby-blue text-white rounded-lg hover:bg-baby-blue/80 transition-colors text-sm font-semibold"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeletePrediction(prediction.id)}
+                            disabled={deletingId === prediction.id}
+                            className={`px-3 py-1 rounded-lg transition-colors text-sm font-semibold ${
+                              deletingId === prediction.id
+                                ? 'bg-neutral-light text-neutral-medium cursor-not-allowed'
+                                : 'bg-red-600 text-white hover:bg-red-700'
+                            }`}
+                          >
+                            {deletingId === prediction.id ? 'Deleting...' : 'Delete'}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Modal */}
+        {showEditModal && editingPrediction && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-2xl w-full my-8">
+              <div className="mb-6">
+                <h2 className="text-2xl font-heading font-bold text-neutral-dark mb-2">
+                  Edit Prediction
+                </h2>
+                <p className="text-neutral-medium">
+                  Editing prediction for {editingPrediction.user.name} ({editingPrediction.user.email})
+                </p>
+              </div>
+
+              <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+                {/* Birth Date */}
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-dark mb-1">
+                    Birth Date
+                  </label>
+                  <input
+                    type="date"
+                    value={new Date(editingPrediction.birthDate).toISOString().split('T')[0]}
+                    onChange={(e) => setEditingPrediction({
+                      ...editingPrediction,
+                      birthDate: new Date(e.target.value).toISOString(),
+                    })}
+                    className="w-full px-4 py-2 rounded-xl border-2 border-neutral-light focus:border-baby-blue focus:outline-none"
+                  />
+                </div>
+
+                {/* Birth Time */}
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-dark mb-1">
+                    Birth Time (HH:MM)
+                  </label>
+                  <input
+                    type="time"
+                    value={editingPrediction.birthTime}
+                    onChange={(e) => setEditingPrediction({
+                      ...editingPrediction,
+                      birthTime: e.target.value,
+                    })}
+                    className="w-full px-4 py-2 rounded-xl border-2 border-neutral-light focus:border-baby-blue focus:outline-none"
+                  />
+                </div>
+
+                {/* Weight */}
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-dark mb-1">
+                    Weight (kg)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={editingPrediction.weight}
+                    onChange={(e) => setEditingPrediction({
+                      ...editingPrediction,
+                      weight: parseFloat(e.target.value),
+                    })}
+                    className="w-full px-4 py-2 rounded-xl border-2 border-neutral-light focus:border-baby-blue focus:outline-none"
+                  />
+                </div>
+
+                {/* Height */}
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-dark mb-1">
+                    Height (cm)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={editingPrediction.height}
+                    onChange={(e) => setEditingPrediction({
+                      ...editingPrediction,
+                      height: parseFloat(e.target.value),
+                    })}
+                    className="w-full px-4 py-2 rounded-xl border-2 border-neutral-light focus:border-baby-blue focus:outline-none"
+                  />
+                </div>
+
+                {/* Eye Color */}
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-dark mb-1">
+                    Eye Color
+                  </label>
+                  <input
+                    type="text"
+                    value={editingPrediction.eyeColor}
+                    onChange={(e) => setEditingPrediction({
+                      ...editingPrediction,
+                      eyeColor: e.target.value,
+                    })}
+                    className="w-full px-4 py-2 rounded-xl border-2 border-neutral-light focus:border-baby-blue focus:outline-none"
+                  />
+                </div>
+
+                {/* Hair Color */}
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-dark mb-1">
+                    Hair Color
+                  </label>
+                  <input
+                    type="text"
+                    value={editingPrediction.hairColor}
+                    onChange={(e) => setEditingPrediction({
+                      ...editingPrediction,
+                      hairColor: e.target.value,
+                    })}
+                    className="w-full px-4 py-2 rounded-xl border-2 border-neutral-light focus:border-baby-blue focus:outline-none"
+                  />
+                </div>
+
+                {/* Connection Types */}
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-dark mb-1">
+                    Connection Types
+                  </label>
+                  <div className="space-y-2">
+                    {['family', 'friends'].map((type) => (
+                      <label key={type} className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={editingPrediction.connectionTypes.includes(type)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setEditingPrediction({
+                                ...editingPrediction,
+                                connectionTypes: [...editingPrediction.connectionTypes, type],
+                              });
+                            } else {
+                              setEditingPrediction({
+                                ...editingPrediction,
+                                connectionTypes: editingPrediction.connectionTypes.filter(t => t !== type),
+                              });
+                            }
+                          }}
+                          className="w-4 h-4 rounded border-2 border-neutral-light focus:ring-baby-blue"
+                        />
+                        <span className="text-neutral-dark capitalize">{type}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditingPrediction(null);
+                  }}
+                  disabled={isSaving}
+                  className="flex-1 px-6 py-3 rounded-xl font-semibold bg-neutral-light text-neutral-dark hover:bg-neutral-medium/20 transition-all duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSavePrediction}
+                  disabled={isSaving}
+                  className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+                    isSaving
+                      ? 'bg-neutral-light text-neutral-medium cursor-not-allowed'
+                      : 'bg-baby-blue text-white hover:bg-baby-blue/80 hover:scale-105'
+                  }`}
+                >
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
             </div>
           </div>
         )}
