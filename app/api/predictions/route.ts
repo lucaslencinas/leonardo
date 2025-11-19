@@ -63,6 +63,7 @@ export async function POST(request: NextRequest) {
             height: validatedData.height,
             eyeColor: validatedData.eyeColor,
             hairColor: validatedData.hairColor,
+            connectionTypes: validatedData.connectionTypes,
           },
           include: {
             user: {
@@ -152,6 +153,7 @@ export async function POST(request: NextRequest) {
           height: validatedData.height,
           eyeColor: validatedData.eyeColor,
           hairColor: validatedData.hairColor,
+          connectionTypes: validatedData.connectionTypes,
         },
         include: {
           user: {
@@ -271,6 +273,7 @@ export async function GET() {
         height: p.height,
         eyeColor: p.eyeColor,
         hairColor: p.hairColor,
+        connectionTypes: p.connectionTypes,
         submittedAt: p.submittedAt,
         user: {
           name: p.user.name,

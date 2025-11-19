@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
         height: prediction.height,
         eyeColor: prediction.eyeColor,
         hairColor: prediction.hairColor,
+        connectionTypes: prediction.connectionTypes,
       },
     });
   } catch (error) {
