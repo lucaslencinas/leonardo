@@ -84,6 +84,9 @@ model Prediction {
   eyeColor  String   // hex or predefined value
   hairColor String   // hex or predefined value
 
+  // Connection type (family, friends, or both)
+  connectionTypes String[] @default([])
+
   // Metadata
   submittedAt DateTime @default(now())
   updatedAt   DateTime @updatedAt
