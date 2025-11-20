@@ -1,12 +1,25 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend lazily to ensure env vars are loaded
+let resend: Resend | null = null;
+
+function getResendClient() {
+  if (!resend) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY is not defined');
+    }
+    resend = new Resend(apiKey);
+  }
+  return resend;
+}
 
 export async function sendVerificationEmail(
   email: string,
   token: string,
   locale: string = 'en'
 ) {
+  const resendClient = getResendClient();
   const verificationUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/${locale}/verify-email?token=${token}&email=${encodeURIComponent(email)}`;
 
   const translations = {
@@ -42,7 +55,7 @@ export async function sendVerificationEmail(
   const t = translations[locale as keyof typeof translations] || translations.en;
 
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await resendClient.emails.send({
       from: process.env.EMAIL_FROM || 'Leonardo <noreply@babyleo.app>',
       to: email,
       subject: t.subject,
