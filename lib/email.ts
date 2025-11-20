@@ -6,10 +6,16 @@ let resend: Resend | null = null;
 function getResendClient() {
   if (!resend) {
     const apiKey = process.env.RESEND_API_KEY;
+    console.log('[Email] Initializing Resend client...');
+    console.log('[Email] RESEND_API_KEY exists:', !!apiKey);
+    console.log('[Email] RESEND_API_KEY length:', apiKey?.length || 0);
+
     if (!apiKey) {
+      console.error('[Email] RESEND_API_KEY is not defined!');
       throw new Error('RESEND_API_KEY is not defined');
     }
     resend = new Resend(apiKey);
+    console.log('[Email] Resend client initialized successfully');
   }
   return resend;
 }
@@ -19,8 +25,15 @@ export async function sendVerificationEmail(
   token: string,
   locale: string = 'en'
 ) {
+  console.log('[Email] sendVerificationEmail called');
+  console.log('[Email] Email:', email);
+  console.log('[Email] Locale:', locale);
+  console.log('[Email] EMAIL_FROM env:', process.env.EMAIL_FROM);
+
   const resendClient = getResendClient();
   const verificationUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/${locale}/verify-email?token=${token}&email=${encodeURIComponent(email)}`;
+
+  console.log('[Email] Verification URL:', verificationUrl);
 
   const translations = {
     en: {
@@ -54,9 +67,16 @@ export async function sendVerificationEmail(
 
   const t = translations[locale as keyof typeof translations] || translations.en;
 
+  const emailFrom = process.env.EMAIL_FROM || 'Leonardo <noreply@babyleo.app>';
+  console.log('[Email] Preparing to send email...');
+  console.log('[Email] From:', emailFrom);
+  console.log('[Email] To:', email);
+  console.log('[Email] Subject:', t.subject);
+
   try {
+    console.log('[Email] Calling resend.emails.send...');
     const { data, error } = await resendClient.emails.send({
-      from: process.env.EMAIL_FROM || 'Leonardo <noreply@babyleo.app>',
+      from: emailFrom,
       to: email,
       subject: t.subject,
       html: `
@@ -85,14 +105,21 @@ export async function sendVerificationEmail(
       `,
     });
 
+    console.log('[Email] resend.emails.send completed');
+    console.log('[Email] Response data:', JSON.stringify(data));
+    console.log('[Email] Response error:', JSON.stringify(error));
+
     if (error) {
-      console.error('Error sending verification email:', error);
+      console.error('[Email] Error from Resend API:', error);
+      console.error('[Email] Error details:', JSON.stringify(error, null, 2));
       return { success: false, error };
     }
 
+    console.log('[Email] Email sent successfully! ID:', data?.id);
     return { success: true, data };
   } catch (error) {
-    console.error('Error sending verification email:', error);
+    console.error('[Email] Exception caught while sending email:', error);
+    console.error('[Email] Exception details:', error instanceof Error ? error.message : JSON.stringify(error));
     return { success: false, error };
   }
 }

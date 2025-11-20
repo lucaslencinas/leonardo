@@ -6,6 +6,11 @@
 - Notification when someone makes a prediction
 - Be able to split results based on connection type. Connection field can be: family or friends. Sofie and Lucas will have this checkbox marked for both. In the UI this check can be added in the name and email stage, it can be a checkbox where you can select both. Anybody can see the results for the family or friends
 
+### New Requirements from Sofie (Nov 20, 2024)
+- Add "suggestions for second name" field in the prediction form
+- Add comment/suggestions/life advice/parenting advice field (for parents)
+- Add comment/message for Leo field (message directly to the baby)
+
 ## 🌈 Nice to Have
 
 - Parents upload baby's first photos
