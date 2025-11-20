@@ -12,6 +12,7 @@ export default function VerifyEmailPage() {
   const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
   const [error, setError] = useState<string>('');
   const [resending, setResending] = useState(false);
+  const [countdown, setCountdown] = useState(5);
 
   const email = searchParams.get('email');
   const token = searchParams.get('token');
@@ -37,10 +38,10 @@ export default function VerifyEmailPage() {
 
         if (response.ok) {
           setStatus('success');
-          // Redirect to predict page after 3 seconds
+          // Redirect to predict page after 5 seconds
           setTimeout(() => {
             router.push('/predict');
-          }, 3000);
+          }, 5000);
         } else {
           setStatus('error');
           setError(data.error || t('verificationFailed'));
@@ -53,6 +54,17 @@ export default function VerifyEmailPage() {
 
     verifyEmail();
   }, [email, token, t, router]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (status === 'success' && countdown > 0) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [status, countdown]);
 
   const handleResendEmail = async () => {
     if (!email) return;
@@ -110,7 +122,11 @@ export default function VerifyEmailPage() {
               </div>
               <h1 className="text-2xl font-bold text-gray-800 mb-2">{t('success')}</h1>
               <p className="text-gray-600 mb-4">{t('successMessage')}</p>
-              <p className="text-sm text-gray-500">{t('redirecting')}</p>
+              <p className="text-sm text-gray-500">
+                {countdown > 0
+                  ? `${t('redirecting')} ${countdown} ${countdown === 1 ? t('second') : t('seconds')}...`
+                  : t('redirecting')}
+              </p>
             </>
           )}
 

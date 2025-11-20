@@ -486,15 +486,15 @@ export default function PredictPage() {
 
               {/* Summary Card */}
               {submitStatus.type !== 'success' && (
-                <div className="bg-baby-cream/30 rounded-3xl p-6 border-2 border-baby-cream space-y-4">
-                  <h3 className="text-lg font-heading font-bold text-neutral-dark text-center">
+                <div className="bg-baby-cream/30 rounded-3xl p-5 border-2 border-baby-cream space-y-2.5">
+                  <h3 className="text-lg font-heading font-bold text-neutral-dark text-center mb-1">
                     {t('predictionSummary')}
                   </h3>
 
                   {/* Personal Info Section */}
-                  <div className="bg-white rounded-2xl p-4">
+                  <div className="bg-white rounded-2xl p-3">
                     <h4 className="text-xs font-semibold text-neutral-medium uppercase mb-2">{t('personalInfo')}</h4>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2.5">
                       <div>
                         <span className="text-xs text-neutral-medium">{t('name')}</span>
                         <div className="text-base font-bold text-neutral-dark">{formData.userName}</div>
@@ -504,7 +504,7 @@ export default function PredictPage() {
                         <div className="text-base font-bold text-neutral-dark truncate">{formData.userEmail}</div>
                       </div>
                     </div>
-                    <div className="mt-3 pt-3 border-t border-neutral-light">
+                    <div className="mt-2.5 pt-2.5 border-t border-neutral-light">
                       <span className="text-xs text-neutral-medium">{t('connectionType')}</span>
                       <div className="flex gap-2 mt-1">
                         {formData.connectionTypes.map((type) => (
@@ -520,9 +520,9 @@ export default function PredictPage() {
                   </div>
 
                   {/* Birth Details Section */}
-                  <div className="bg-white rounded-2xl p-4">
+                  <div className="bg-white rounded-2xl p-3">
                     <h4 className="text-xs font-semibold text-neutral-medium uppercase mb-2">{t('birthDetails')}</h4>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2.5">
                       <div>
                         <span className="text-xs text-neutral-medium">{t('dateLabel')}</span>
                         <div className="text-base font-bold text-neutral-dark">{formData.birthDate.toLocaleDateString()}</div>
@@ -537,9 +537,9 @@ export default function PredictPage() {
                   </div>
 
                   {/* Physical Details Section */}
-                  <div className="bg-white rounded-2xl p-4">
+                  <div className="bg-white rounded-2xl p-3">
                     <h4 className="text-xs font-semibold text-neutral-medium uppercase mb-2">{t('physicalDetails')}</h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                       <div>
                         <span className="text-xs text-neutral-medium">{t('weightLabel')}</span>
                         <div className="text-base font-bold text-neutral-dark">{formData.weight} {t('weightUnit')}</div>
