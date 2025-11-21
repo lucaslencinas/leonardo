@@ -29,6 +29,14 @@
     "passwordRequired": "Password is required",
     "nameRequired": "Name is required"
   },
+  "accessCode": {
+    "title": "Welcome to Baby Leo!",
+    "subtitle": "Enter your access code to join the prediction game",
+    "inputLabel": "Access Code",
+    "submitButton": "Continue",
+    "verifying": "Verifying...",
+    "helpText": "Don't have an access code? Contact Lucas or Sofie!"
+  },
   "home": {
     "welcome": "Welcome to Baby Leo's Prediction Game!",
     "subtitle": "Join the family fun and predict Leo's arrival details",

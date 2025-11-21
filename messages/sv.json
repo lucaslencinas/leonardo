@@ -29,6 +29,14 @@
     "passwordRequired": "Lösenord krävs",
     "nameRequired": "Namn krävs"
   },
+  "accessCode": {
+    "title": "Välkommen till Baby Leo!",
+    "subtitle": "Ange din åtkomstkod för att delta i förutsägelsespelet",
+    "inputLabel": "Åtkomstkod",
+    "submitButton": "Fortsätt",
+    "verifying": "Verifierar...",
+    "helpText": "Har du ingen åtkomstkod? Kontakta Lucas eller Sofie!"
+  },
   "home": {
     "welcome": "Välkommen till Baby Leos Förutsägelsespel!",
     "subtitle": "Gå med i familjens roliga spel och förutsäg Leos ankomstdetaljer",

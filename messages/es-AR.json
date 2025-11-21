@@ -29,6 +29,14 @@
     "passwordRequired": "La contraseña es obligatoria",
     "nameRequired": "El nombre es obligatorio"
   },
+  "accessCode": {
+    "title": "¡Bienvenido a Baby Leo!",
+    "subtitle": "Ingresá tu código de acceso para unirte al juego de predicciones",
+    "inputLabel": "Código de Acceso",
+    "submitButton": "Continuar",
+    "verifying": "Verificando...",
+    "helpText": "¿No tenés código de acceso? ¡Contactá a Lucas o Sofie!"
+  },
   "home": {
     "welcome": "¡Bienvenido al Juego de Predicciones del Bebé Leo!",
     "subtitle": "Unite a la diversión familiar y predecí los detalles del nacimiento de Leo",

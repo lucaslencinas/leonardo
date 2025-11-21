@@ -4,12 +4,27 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { Countdown } from '@/components/home/Countdown';
 import { useState, useEffect } from 'react';
+import AccessCodeGate from '@/components/AccessCodeGate';
+import { useParams } from 'next/navigation';
 
 export default function HomePage() {
   const t = useTranslations('home');
+  const params = useParams();
+  const locale = params.locale as string;
   const [participantCount, setParticipantCount] = useState<number | null>(null);
+  const [hasAccess, setHasAccess] = useState(false);
 
   useEffect(() => {
+    // Check if user already has access code in localStorage
+    const storedCode = localStorage.getItem('accessCode');
+    if (storedCode) {
+      setHasAccess(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hasAccess) return;
+
     const fetchParticipants = async () => {
       try {
         const response = await fetch('/api/predictions');
@@ -24,7 +39,12 @@ export default function HomePage() {
       }
     };
     fetchParticipants();
-  }, []);
+  }, [hasAccess]);
+
+  // Show access code gate if user doesn't have access
+  if (!hasAccess) {
+    return <AccessCodeGate onAccessGranted={() => setHasAccess(true)} locale={locale} />;
+  }
 
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center text-center">
