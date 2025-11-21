@@ -159,6 +159,7 @@ export default function PredictPage() {
       }
 
       // Save email to localStorage to track that user has submitted
+      localStorage.setItem('userEmail', formData.userEmail);
       localStorage.setItem('predictionSubmitted', formData.userEmail);
 
       setSubmitStatus({

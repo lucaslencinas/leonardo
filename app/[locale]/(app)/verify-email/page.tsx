@@ -38,6 +38,14 @@ export default function VerifyEmailPage() {
 
         if (response.ok) {
           setStatus('success');
+
+          // Store email in localStorage for UserHeader
+          if (email) {
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('emailVerified', 'true');
+            localStorage.setItem('verifiedAt', new Date().toISOString());
+          }
+
           // Redirect to predict page after 5 seconds
           setTimeout(() => {
             router.push('/predict');

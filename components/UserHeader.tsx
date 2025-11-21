@@ -11,11 +11,33 @@ export default function UserHeader() {
   const router = useRouter();
 
   useEffect(() => {
+    // Check for email on mount
     const email = localStorage.getItem('userEmail');
     if (email) {
       setUserEmail(email);
     }
-  }, []);
+
+    // Listen for storage changes (for cross-tab updates)
+    const handleStorageChange = () => {
+      const updatedEmail = localStorage.getItem('userEmail');
+      setUserEmail(updatedEmail);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Poll for changes (for same-tab updates)
+    const interval = setInterval(() => {
+      const currentEmail = localStorage.getItem('userEmail');
+      if (currentEmail !== userEmail) {
+        setUserEmail(currentEmail);
+      }
+    }, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, [userEmail]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
