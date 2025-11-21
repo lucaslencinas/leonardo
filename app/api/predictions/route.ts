@@ -102,10 +102,8 @@ export async function POST(request: NextRequest) {
         // Get locale from request body
         const locale = body.locale || 'en';
 
-        // Send verification email (don't await to avoid blocking the response)
-        sendVerificationEmail(normalizedEmail, token, locale).catch(err =>
-          console.error('Failed to send verification email:', err)
-        );
+        // Send verification email
+        await sendVerificationEmail(normalizedEmail, token, locale);
       }
 
       return NextResponse.json(
@@ -192,10 +190,8 @@ export async function POST(request: NextRequest) {
       // Get locale from request body
       const locale = body.locale || 'en';
 
-      // Send verification email (don't await to avoid blocking the response)
-      sendVerificationEmail(normalizedEmail, token, locale).catch(err =>
-        console.error('Failed to send verification email:', err)
-      );
+      // Send verification email
+      await sendVerificationEmail(normalizedEmail, token, locale);
     }
 
     return NextResponse.json(
