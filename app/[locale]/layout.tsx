@@ -3,6 +3,7 @@ import { getMessages } from 'next-intl/server';
 import { ReactNode } from 'react';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { setRequestLocale } from 'next-intl/server';
+import UserHeader from '@/components/UserHeader';
 
 type Props = {
   children: ReactNode;
@@ -19,6 +20,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <NextIntlClientProvider messages={messages}>
+      <UserHeader />
       <div className="fixed top-4 right-4 z-50">
         <LanguageSwitcher />
       </div>
